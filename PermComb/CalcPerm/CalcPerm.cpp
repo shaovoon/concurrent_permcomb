@@ -2,8 +2,9 @@
 #include <iostream>
 #include <iomanip>
 #include <numeric>
-#include <intrin.h>
-#include <boost/multiprecision/cpp_int.hpp>
+#include <string>
+//#include <intrin.h>
+//#include <boost/multiprecision/cpp_int.hpp>
 #include "../permcomb/concurrent_perm.h"
 
 void test_find_perm(uint32_t PermSetSize);
@@ -109,7 +110,8 @@ struct empty_callback_t
 };
 
 //typedef boost::multiprecision::cpp_int int_type;
-typedef boost::multiprecision::int256_t int_type;
+//typedef boost::multiprecision::int256_t int_type;
+typedef int64_t int_type;
 
 int main(int argc, char* argv[])
 {

@@ -194,12 +194,12 @@ void worker_thread_proc(const int_type thread_index,
 	std::vector<uint32_t> results(subset);
 	std::iota(results.begin(), results.end(), 0);
 
-	std::vector< std::iterator_traits<bidirectional_iterator>::value_type> fullset_vec(begin, end);
+	std::vector< typename std::iterator_traits<bidirectional_iterator>::value_type> fullset_vec(begin, end);
 	if(start_index>0)
 	{
 		find_comb(fullset, subset, start_index, results);
 	}
-	std::vector< std::iterator_traits<bidirectional_iterator>::value_type> vec;
+	std::vector< typename std::iterator_traits<bidirectional_iterator>::value_type> vec;
 	for(size_t i=0; i<results.size(); ++i)
 	{
 		vec.push_back(fullset_vec[results[i]]);

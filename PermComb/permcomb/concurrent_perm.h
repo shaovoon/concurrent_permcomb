@@ -133,12 +133,12 @@ void worker_thread_proc(const int_type thread_index,
 	callback_type callback)
 {
 	std::vector<uint32_t> results;
-	std::vector< std::iterator_traits<bidirectional_iterator>::value_type> vec(begin, end);
+	std::vector< typename std::iterator_traits<bidirectional_iterator>::value_type> vec(begin, end);
 	if(start_index>0)
 	{
 		if(concurrent_perm::find_perm(set_size, start_index, results))
 		{
-			std::vector< std::iterator_traits<bidirectional_iterator>::value_type> vecTemp(begin, end);
+			std::vector< typename std::iterator_traits<bidirectional_iterator>::value_type> vecTemp(begin, end);
 			for(size_t i=0; i<results.size(); ++i)
 			{
 				vec[i] = vecTemp[ results[i] ];

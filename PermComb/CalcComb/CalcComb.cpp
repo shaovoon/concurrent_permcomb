@@ -1,8 +1,9 @@
 #include <chrono>
 #include <iostream>
 #include <iomanip>
-#include <intrin.h>
-#include <boost/multiprecision/cpp_int.hpp>
+#include <string>
+//#include <intrin.h>
+//#include <boost/multiprecision/cpp_int.hpp>
 #include "../permcomb/concurrent_comb.h"
 
 void test_find_comb(uint32_t fullset, uint32_t subset);
@@ -116,14 +117,15 @@ struct empty_callback_t
 };
 
 //typedef boost::multiprecision::cpp_int int_type;
-typedef boost::multiprecision::int256_t int_type;
+//typedef boost::multiprecision::int256_t int_type;
+typedef int64_t int_type;
 
 int main(int argc, char* argv[])
 {
 	int_type thread_cnt = 3;
 	how_to_use_thread_index_comb(thread_cnt, 10, 5);
 
-	//benchmark_comb();
+	benchmark_comb();
 
 	//test_find_comb(5, 2);
 
@@ -132,11 +134,11 @@ int main(int argc, char* argv[])
 
 void benchmark_comb()
 {
-	std::vector<int> fullset_vec(24);
+	std::vector<int> fullset_vec(20);
 	std::iota(fullset_vec.begin(), fullset_vec.end(), 0);
 
 	int_type thread_cnt = 1;
-	uint32_t subset = 12;
+	uint32_t subset = 10;
 
 	typedef empty_callback_t<int_type, decltype(fullset_vec.cbegin())> callback_t;
 
