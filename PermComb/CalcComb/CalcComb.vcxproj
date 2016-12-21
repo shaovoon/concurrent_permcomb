@@ -95,6 +95,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\common\timer.h" />
     <ClInclude Include="..\permcomb\combination.h" />
     <ClInclude Include="..\permcomb\concurrent_comb.h" />
   </ItemGroup>

@@ -1,36 +1,13 @@
-#include <chrono>
 #include <iostream>
-#include <iomanip>
 #include <numeric>
 #include <string>
 //#include <intrin.h>
 //#include <boost/multiprecision/cpp_int.hpp>
 #include "../permcomb/concurrent_perm.h"
+#include "../common/timer.h"
 
 void test_find_perm(uint32_t PermSetSize);
 void benchmark_perm();
-
-class timer
-{
-public:
-	timer() = default;
-	void start_timing(const std::string& text_)
-	{
-		text = text_;
-		begin = std::chrono::high_resolution_clock::now();
-	}
-	void stop_timing()
-	{
-		auto end = std::chrono::high_resolution_clock::now();
-		auto dur = end - begin;
-		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
-		std::cout << std::setw(16) << text << ":" << std::setw(5) << ms << "ms" << std::endl;
-	}
-
-private:
-	std::string text;
-	std::chrono::high_resolution_clock::time_point begin;
-};
 
 template<typename T>
 bool compare_vec(std::vector<T>& results1, std::vector<T>& results2)
@@ -127,15 +104,25 @@ int main(int argc, char* argv[])
 
 void benchmark_perm()
 {
-	//std::vector<char> results(11);
 	std::string results(11, 'A');
 	std::iota(results.begin(), results.end(), 'A');
+
+	timer stopwatch;
+	{
+		std::string results2(results.begin(), results.end());
+
+		stopwatch.start_timing("Plain vanilla");
+		while (std::next_permutation(results2.begin(), results2.end()))
+		{
+
+		}
+		stopwatch.stop_timing();
+	}
 
 	int_type thread_cnt = 1;
 
 	typedef empty_callback_t<int_type, std::vector<char>::const_iterator> callback_t;
 
-	timer stopwatch;
 	stopwatch.start_timing("1 thread(s)");
 	thread_cnt = 1;
 	concurrent_perm::compute_all_perm(thread_cnt, results.cbegin(), results.cend(), callback_t());

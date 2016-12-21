@@ -1,35 +1,12 @@
-#include <chrono>
 #include <iostream>
-#include <iomanip>
 #include <string>
 //#include <intrin.h>
 //#include <boost/multiprecision/cpp_int.hpp>
 #include "../permcomb/concurrent_comb.h"
+#include "../common/timer.h"
 
 void test_find_comb(uint32_t fullset, uint32_t subset);
 void benchmark_comb();
-
-class timer
-{
-public:
-	timer() = default;
-	void start_timing(const std::string& text_)
-	{
-		text = text_;
-		begin = std::chrono::high_resolution_clock::now();
-	}
-	void stop_timing()
-	{
-		auto end = std::chrono::high_resolution_clock::now();
-		auto dur = end - begin;
-		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
-		std::cout << std::setw(16) << text << ":" << std::setw(5) << ms << "ms" << std::endl;
-	}
-
-private:
-	std::string text;
-	std::chrono::high_resolution_clock::time_point begin;
-};
 
 template<typename T>
 bool compare_vec(std::vector<T>& results1, std::vector<T>& results2)
@@ -136,13 +113,26 @@ void benchmark_comb()
 {
 	std::vector<int> fullset_vec(20);
 	std::iota(fullset_vec.begin(), fullset_vec.end(), 0);
+	uint32_t subset = 10;
+
+	timer stopwatch;
+	{
+		std::string fullset_vec2(fullset_vec.begin(), fullset_vec.end());
+		std::string subset_vec(fullset_vec.begin(), fullset_vec.begin()+ subset);
+
+		stopwatch.start_timing("Plain vanilla");
+		while (stdcomb::next_combination(fullset_vec2.begin(), fullset_vec2.end(), subset_vec.begin(), subset_vec.end()))
+		{
+
+		}
+		stopwatch.stop_timing();
+	}
+
 
 	int_type thread_cnt = 1;
-	uint32_t subset = 10;
 
 	typedef empty_callback_t<int_type, decltype(fullset_vec.cbegin())> callback_t;
 
-	timer stopwatch;
 	stopwatch.start_timing("1 thread(s)");
 	thread_cnt = 1;
 	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec.cbegin(), fullset_vec.cend(), callback_t());

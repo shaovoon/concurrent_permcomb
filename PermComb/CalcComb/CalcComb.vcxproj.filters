@@ -29,5 +29,8 @@
     <ClInclude Include="..\permcomb\concurrent_comb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
