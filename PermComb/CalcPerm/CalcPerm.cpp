@@ -41,10 +41,10 @@ bool how_to_use_thread_index_perm(int_type thread_cnt, uint32_t set_size)
 
 	std::vector<std::vector< std::vector<char> > > vecvecvec((size_t)thread_cnt);
 
-	concurrent_perm::compute_all_perm(thread_cnt, results.cbegin(), results.cend(),
-		[&vecvecvec] (const int_type thread_index, auto begin, auto end) -> bool
+	concurrent_perm::compute_all_perm(thread_cnt, results,
+		[&vecvecvec] (const int thread_index, const auto& cont) -> bool
 	{
-		vecvecvec[(size_t)thread_index].push_back(std::vector<char>(begin, end));
+		vecvecvec[thread_index].push_back(cont);
 		return true;
 	});
 
@@ -77,10 +77,10 @@ bool how_to_use_thread_index_perm(int_type thread_cnt, uint32_t set_size)
 }
 
 // return false to stop processing
-template<typename int_type, typename bidirectional_iterator>
+template<typename int_type, typename container_type>
 struct empty_callback_t
 {
-	bool operator()(const int_type thread_index, bidirectional_iterator begin, bidirectional_iterator end)
+	bool operator()(const int thread_index, const container_type& cont)
 	{
 		return true;
 	}
@@ -121,26 +121,26 @@ void benchmark_perm()
 
 	int_type thread_cnt = 1;
 
-	typedef empty_callback_t<int_type, std::vector<char>::const_iterator> callback_t;
+	typedef empty_callback_t<int_type, decltype(results)> callback_t;
 
 	stopwatch.start_timing("1 thread(s)");
 	thread_cnt = 1;
-	concurrent_perm::compute_all_perm(thread_cnt, results.cbegin(), results.cend(), callback_t());
+	concurrent_perm::compute_all_perm(thread_cnt, results, callback_t());
 	stopwatch.stop_timing();
 
 	stopwatch.start_timing("2 thread(s)");
 	thread_cnt = 2;
-	concurrent_perm::compute_all_perm(thread_cnt, results.cbegin(), results.cend(), callback_t());
+	concurrent_perm::compute_all_perm(thread_cnt, results, callback_t());
 	stopwatch.stop_timing();
 
 	stopwatch.start_timing("3 thread(s)");
 	thread_cnt = 3;
-	concurrent_perm::compute_all_perm(thread_cnt, results.cbegin(), results.cend(), callback_t());
+	concurrent_perm::compute_all_perm(thread_cnt, results, callback_t());
 	stopwatch.stop_timing();
 
 	stopwatch.start_timing("4 thread(s)");
 	thread_cnt = 4;
-	concurrent_perm::compute_all_perm(thread_cnt, results.cbegin(), results.cend(), callback_t());
+	concurrent_perm::compute_all_perm(thread_cnt, results, callback_t());
 	stopwatch.stop_timing();
 }
 

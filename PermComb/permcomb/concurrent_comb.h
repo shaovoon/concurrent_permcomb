@@ -181,43 +181,42 @@ bool find_comb(const uint32_t fullset,
 	return true;
 };
 
-template<typename int_type, typename bidirectional_iterator, typename callback_type>
+template<typename int_type, typename container_type, typename callback_type>
 void worker_thread_proc(const int_type thread_index, 
-						bidirectional_iterator begin, 
-						bidirectional_iterator end, 
+						const container_type& cont,
 						int_type start_index, 
 						int_type end_index, 
-						uint32_t fullset, 
 						uint32_t subset, 
 						callback_type callback)
 {
+	const int thread_index_n = thread_index;
+
 	std::vector<uint32_t> results(subset);
 	std::iota(results.begin(), results.end(), 0);
 
-	std::vector< typename std::iterator_traits<bidirectional_iterator>::value_type> fullset_vec(begin, end);
 	if(start_index>0)
 	{
-		find_comb(fullset, subset, start_index, results);
+		find_comb(cont.size(), subset, start_index, results);
 	}
-	std::vector< typename std::iterator_traits<bidirectional_iterator>::value_type> vec;
+	container_type vec;
 	for(size_t i=0; i<results.size(); ++i)
 	{
-		vec.push_back(fullset_vec[results[i]]);
+		vec.push_back(cont[results[i]]);
 	}
+	container_type cont2(cont.begin(), cont.end());
 	for(int_type j=start_index; j<end_index; ++j)
 	{
-		if(!callback(thread_index, fullset, subset, vec.cbegin(), vec.cend()))
+		if(!callback(thread_index_n, cont.size(), subset, vec))
 			return;
-		stdcomb::next_combination(fullset_vec.begin(), fullset_vec.end(), vec.begin(), vec.end());
+		stdcomb::next_combination(cont2.begin(), cont2.end(), vec.begin(), vec.end());
 	}
 }
 
-template<typename int_type, typename bidirectional_iterator, typename callback_type>
-bool compute_all_comb(int_type thread_cnt, uint32_t subset, bidirectional_iterator begin, bidirectional_iterator end, callback_type callback)
+template<typename int_type, typename container_type, typename callback_type>
+bool compute_all_comb(int_type thread_cnt, uint32_t subset, const container_type& cont, callback_type callback)
 {
 	int_type total_comb=0; 
-	typename std::iterator_traits<bidirectional_iterator>::difference_type fullset = std::distance(begin, end);
-	if (!find_total_comb(fullset, subset, total_comb))
+	if (!find_total_comb(cont.size(), subset, total_comb))
 		return false;
 
 	int_type each_thread_elem_cnt = total_comb / thread_cnt;
@@ -237,7 +236,7 @@ bool compute_all_comb(int_type thread_cnt, uint32_t subset, bidirectional_iterat
 		int_type start_index = i*each_thread_elem_cnt; 
 		int_type end_index = start_index + bulk;
 		threads.push_back( std::shared_ptr<std::thread>(new std::thread(
-			std::bind(worker_thread_proc<int_type, bidirectional_iterator, callback_type>, i, begin, end, start_index, end_index, fullset, subset, callback))));
+			std::bind(worker_thread_proc<int_type, container_type, callback_type>, i, cont, start_index, end_index, subset, callback))));
 	}
 
 	bulk = each_thread_elem_cnt;
@@ -249,7 +248,7 @@ bool compute_all_comb(int_type thread_cnt, uint32_t subset, bidirectional_iterat
 	int_type start_index = 0; 
 	int_type end_index = bulk;
 	int_type thread_index=0;
-	worker_thread_proc<int_type, bidirectional_iterator, callback_type>( thread_index, begin, end, start_index, end_index, fullset, subset, callback );
+	worker_thread_proc<int_type, container_type, callback_type>( thread_index, cont, start_index, end_index, subset, callback );
 
 	for(size_t i=0; i<threads.size(); ++i)
 	{

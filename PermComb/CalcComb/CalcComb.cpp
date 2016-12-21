@@ -40,12 +40,12 @@ bool how_to_use_thread_index_comb(int_type thread_cnt, uint32_t fullset_size, ui
 
 	std::vector<std::vector< std::vector<uint32_t> > > vecvecvec((size_t)thread_cnt);
 
-	concurrent_comb::compute_all_comb(thread_cnt, subset_size, fullset.cbegin(), fullset.cend(),
-		[&vecvecvec](const int_type thread_index, 
+	concurrent_comb::compute_all_comb(thread_cnt, subset_size, fullset,
+		[&vecvecvec](const int thread_index, 
 			uint32_t fullset_cnt, uint32_t subset_cnt, 
-			auto begin, auto end) -> bool
+			const auto& cont) -> bool
 		{
-			vecvecvec[(size_t)thread_index].push_back(std::vector<uint32_t>(begin, end));
+			vecvecvec[(size_t)thread_index].push_back(cont);
 			return true;
 		});
 
@@ -83,11 +83,11 @@ bool how_to_use_thread_index_comb(int_type thread_cnt, uint32_t fullset_size, ui
 }
 
 // return false to stop processing
-template<typename int_type, typename bidirectional_iterator>
+template<typename int_type, typename container_type>
 struct empty_callback_t
 {
-	bool operator()(const int_type thread_index, uint32_t fullset,
-		uint32_t subset, bidirectional_iterator begin, bidirectional_iterator end)
+	bool operator()(const int thread_index, uint32_t fullset,
+		uint32_t subset, const container_type& cont)
 	{
 		return true;
 	}
@@ -131,26 +131,26 @@ void benchmark_comb()
 
 	int_type thread_cnt = 1;
 
-	typedef empty_callback_t<int_type, decltype(fullset_vec.cbegin())> callback_t;
+	typedef empty_callback_t<int_type, decltype(fullset_vec)> callback_t;
 
 	stopwatch.start_timing("1 thread(s)");
 	thread_cnt = 1;
-	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec.cbegin(), fullset_vec.cend(), callback_t());
+	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, callback_t());
 	stopwatch.stop_timing();
 
 	stopwatch.start_timing("2 thread(s)");
 	thread_cnt = 2;
-	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec.cbegin(), fullset_vec.cend(), callback_t());
+	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, callback_t());
 	stopwatch.stop_timing();
 
 	stopwatch.start_timing("3 thread(s)");
 	thread_cnt = 3;
-	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec.cbegin(), fullset_vec.cend(), callback_t());
+	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, callback_t());
 	stopwatch.stop_timing();
 
 	stopwatch.start_timing("4 thread(s)");
 	thread_cnt = 4;
-	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec.cbegin(), fullset_vec.cend(), callback_t());
+	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, callback_t());
 	stopwatch.stop_timing();
 }
 

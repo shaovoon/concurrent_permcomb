@@ -123,22 +123,21 @@ bool find_perm(uint32_t set_size,
 	return processed;
 }
 
-template<typename int_type, typename bidirectional_iterator, typename callback_type>
-void worker_thread_proc(const int_type thread_index, 
-	bidirectional_iterator begin, 
-	bidirectional_iterator end, 
+template<typename int_type, typename container_type, typename callback_type>
+void worker_thread_proc(const int_type& thread_index, 
+	const container_type& cont,
 	int_type start_index, 
 	int_type end_index, 
-	uint32_t set_size, 
 	callback_type callback)
 {
+	const int thread_index_n = thread_index;
 	std::vector<uint32_t> results;
-	std::vector< typename std::iterator_traits<bidirectional_iterator>::value_type> vec(begin, end);
+	container_type vec(cont.cbegin(), cont.cend());
 	if(start_index>0)
 	{
-		if(concurrent_perm::find_perm(set_size, start_index, results))
+		if(concurrent_perm::find_perm(cont.size(), start_index, results))
 		{
-			std::vector< typename std::iterator_traits<bidirectional_iterator>::value_type> vecTemp(begin, end);
+			container_type vecTemp(cont.cbegin(), cont.cend());
 			for(size_t i=0; i<results.size(); ++i)
 			{
 				vec[i] = vecTemp[ results[i] ];
@@ -148,18 +147,17 @@ void worker_thread_proc(const int_type thread_index,
 
 	for (int_type j = start_index; j<end_index; ++j)
 	{
-		if (!callback(thread_index, vec.cbegin(), vec.cend()))
+		if (!callback(thread_index_n, vec))
 			return;
 		std::next_permutation(vec.begin(), vec.end());
 	}
 }
 
-template<typename int_type, typename bidirectional_iterator, typename callback_type>
-bool compute_all_perm(int_type thread_cnt, bidirectional_iterator begin, bidirectional_iterator end, callback_type callback)
+template<typename int_type, typename container_type, typename callback_type>
+bool compute_all_perm(int_type thread_cnt, const container_type& cont, callback_type callback)
 {
 	int_type factorial=0; 
-	typename std::iterator_traits<bidirectional_iterator>::difference_type set_size = std::distance(begin, end);
-	compute_factorial( set_size, factorial );
+	compute_factorial(cont.size(), factorial );
 
 	int_type each_thread_elem_cnt = factorial / thread_cnt;
 	int_type remainder = factorial % thread_cnt;
@@ -178,7 +176,7 @@ bool compute_all_perm(int_type thread_cnt, bidirectional_iterator begin, bidirec
 		int_type start_index = i*each_thread_elem_cnt; 
 		int_type end_index = start_index + bulk;
 		threads.push_back( std::shared_ptr<std::thread>(new std::thread(
-			std::bind(worker_thread_proc<int_type, bidirectional_iterator, callback_type>, i, begin, end, start_index, end_index, set_size, callback))));
+			std::bind(worker_thread_proc<int_type, container_type, callback_type>, i, cont, start_index, end_index, callback))));
 	}
 
 	bulk = each_thread_elem_cnt;
@@ -189,7 +187,7 @@ bool compute_all_perm(int_type thread_cnt, bidirectional_iterator begin, bidirec
 
 	int_type start_index = 0; 
 	int_type end_index = bulk;
-	worker_thread_proc<int_type, bidirectional_iterator, callback_type>( 0, begin, end, start_index, end_index, set_size, callback );
+	worker_thread_proc<int_type, container_type, callback_type>( 0, cont, start_index, end_index, callback );
 
 	for(size_t i=0; i<threads.size(); ++i)
 	{
