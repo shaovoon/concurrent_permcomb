@@ -111,37 +111,37 @@ void benchmark_perm()
 	{
 		std::string results2(results.begin(), results.end());
 
-		stopwatch.start_timing("Plain vanilla");
+		stopwatch.start("Plain vanilla");
 		while (std::next_permutation(results2.begin(), results2.end()))
 		{
 
 		}
-		stopwatch.stop_timing();
+		stopwatch.stop();
 	}
 
 	int_type thread_cnt = 1;
 
 	typedef empty_callback_t<decltype(results)> callback_t;
 
-	stopwatch.start_timing("1 thread(s)");
+	stopwatch.start("1 thread(s)");
 	thread_cnt = 1;
 	concurrent_perm::compute_all_perm(thread_cnt, results, callback_t());
-	stopwatch.stop_timing();
+	stopwatch.stop();
 
-	stopwatch.start_timing("2 thread(s)");
+	stopwatch.start("2 thread(s)");
 	thread_cnt = 2;
 	concurrent_perm::compute_all_perm(thread_cnt, results, callback_t());
-	stopwatch.stop_timing();
+	stopwatch.stop();
 
-	stopwatch.start_timing("3 thread(s)");
+	stopwatch.start("3 thread(s)");
 	thread_cnt = 3;
 	concurrent_perm::compute_all_perm(thread_cnt, results, callback_t());
-	stopwatch.stop_timing();
+	stopwatch.stop();
 
-	stopwatch.start_timing("4 thread(s)");
+	stopwatch.start("4 thread(s)");
 	thread_cnt = 4;
 	concurrent_perm::compute_all_perm(thread_cnt, results, callback_t());
-	stopwatch.stop_timing();
+	stopwatch.stop();
 }
 
 void test_find_perm(uint32_t set_size)

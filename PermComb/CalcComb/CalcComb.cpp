@@ -120,12 +120,12 @@ void benchmark_comb()
 		std::string fullset_vec2(fullset_vec.begin(), fullset_vec.end());
 		std::string subset_vec(fullset_vec.begin(), fullset_vec.begin()+ subset);
 
-		stopwatch.start_timing("Plain vanilla");
+		stopwatch.start("Plain vanilla");
 		while (stdcomb::next_combination(fullset_vec2.begin(), fullset_vec2.end(), subset_vec.begin(), subset_vec.end()))
 		{
 
 		}
-		stopwatch.stop_timing();
+		stopwatch.stop();
 	}
 
 
@@ -133,25 +133,25 @@ void benchmark_comb()
 
 	typedef empty_callback_t<decltype(fullset_vec)> callback_t;
 
-	stopwatch.start_timing("1 thread(s)");
+	stopwatch.start("1 thread(s)");
 	thread_cnt = 1;
 	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, callback_t());
-	stopwatch.stop_timing();
+	stopwatch.stop();
 
-	stopwatch.start_timing("2 thread(s)");
+	stopwatch.start("2 thread(s)");
 	thread_cnt = 2;
 	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, callback_t());
-	stopwatch.stop_timing();
+	stopwatch.stop();
 
-	stopwatch.start_timing("3 thread(s)");
+	stopwatch.start("3 thread(s)");
 	thread_cnt = 3;
 	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, callback_t());
-	stopwatch.stop_timing();
+	stopwatch.stop();
 
-	stopwatch.start_timing("4 thread(s)");
+	stopwatch.start("4 thread(s)");
 	thread_cnt = 4;
 	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, callback_t());
-	stopwatch.stop_timing();
+	stopwatch.stop();
 }
 
 void test_find_comb(uint32_t fullset, uint32_t subset)

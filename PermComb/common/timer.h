@@ -8,12 +8,12 @@ class timer
 {
 public:
 	timer() = default;
-	void start_timing(const std::string& text_)
+	void start(const std::string& text_)
 	{
 		text = text_;
 		begin = std::chrono::high_resolution_clock::now();
 	}
-	void stop_timing()
+	void stop()
 	{
 		auto end = std::chrono::high_resolution_clock::now();
 		auto dur = end - begin;
