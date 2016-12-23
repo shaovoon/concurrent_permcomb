@@ -91,5 +91,12 @@ Cancellation is not directly supported but every callback can return false to st
 ### Benchmark results
 
 ```
+Results for permutation of 11 elements:
+Total permutations computed: 39,916,800 - 1
 
+next_permutation:  163ms
+     1 thread(s):  175ms
+     2 thread(s):   95ms
+     3 thread(s):   48ms
+     4 thread(s):   50ms
 ```

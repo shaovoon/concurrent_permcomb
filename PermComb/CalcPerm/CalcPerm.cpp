@@ -111,7 +111,7 @@ void benchmark_perm()
 	{
 		std::string results2(results.begin(), results.end());
 
-		stopwatch.start("Plain vanilla");
+		stopwatch.start("next_permutation");
 		while (std::next_permutation(results2.begin(), results2.end()))
 		{
 
