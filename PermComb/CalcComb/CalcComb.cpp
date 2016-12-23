@@ -120,7 +120,7 @@ void benchmark_comb()
 		std::string fullset_vec2(fullset_vec.begin(), fullset_vec.end());
 		std::string subset_vec(fullset_vec.begin(), fullset_vec.begin()+ subset);
 
-		stopwatch.start("Plain vanilla");
+		stopwatch.start("next_combination");
 		while (stdcomb::next_combination(fullset_vec2.begin(), fullset_vec2.end(), subset_vec.begin(), subset_vec.end()))
 		{
 

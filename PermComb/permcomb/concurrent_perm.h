@@ -130,7 +130,7 @@ void worker_thread_proc(const int_type& thread_index,
 	int_type end_index, 
 	callback_type callback)
 {
-	const int thread_index_n = thread_index;
+	const int thread_index_n = static_cast<const int>(thread_index);
 	std::vector<uint32_t> results;
 	container_type vec(cont.cbegin(), cont.cend());
 	if(start_index>0)

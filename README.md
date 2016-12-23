@@ -90,13 +90,26 @@ Cancellation is not directly supported but every callback can return false to st
 
 ### Benchmark results
 
+Note: there is some overhead.
+
 ```
 Results for permutation of 11 elements:
 Total permutations computed: 39,916,800 - 1
+int64_t type used.
 
 next_permutation:  163ms
      1 thread(s):  175ms
      2 thread(s):   95ms
      3 thread(s):   48ms
      4 thread(s):   50ms
+
+Results for combination of 14 out of 28 elements:
+Total combinations computed: 40,116,600 - 1
+int128_t type used.
+ 
+next_combination:  828ms
+     1 thread(s): 1271ms
+     2 thread(s):  718ms
+     3 thread(s):  401ms
+     4 thread(s):  354ms
 ```

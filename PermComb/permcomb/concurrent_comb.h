@@ -189,7 +189,7 @@ void worker_thread_proc(const int_type thread_index,
 						uint32_t subset, 
 						callback_type callback)
 {
-	const int thread_index_n = thread_index;
+	const int thread_index_n = static_cast<const int>(thread_index);
 
 	std::vector<uint32_t> results(subset);
 	std::iota(results.begin(), results.end(), 0);
