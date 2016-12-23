@@ -83,7 +83,7 @@ bool how_to_use_thread_index_comb(int_type thread_cnt, uint32_t fullset_size, ui
 }
 
 // return false to stop processing
-template<typename int_type, typename container_type>
+template<typename container_type>
 struct empty_callback_t
 {
 	bool operator()(const int thread_index, uint32_t fullset,
@@ -131,7 +131,7 @@ void benchmark_comb()
 
 	int_type thread_cnt = 1;
 
-	typedef empty_callback_t<int_type, decltype(fullset_vec)> callback_t;
+	typedef empty_callback_t<decltype(fullset_vec)> callback_t;
 
 	stopwatch.start_timing("1 thread(s)");
 	thread_cnt = 1;

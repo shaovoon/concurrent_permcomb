@@ -14,9 +14,9 @@ C++11
 
 ```cpp
 // arbitrary integer
-typedef boost::multiprecision::cpp_int int_type;
+boost::multiprecision::cpp_int;
 // 256 bit integer
-typedef boost::multiprecision::int256_t int_type;
+boost::multiprecision::int256_t;
 ```
 
 ### Compiler tested
@@ -45,28 +45,17 @@ Example on compute_all_perm
 ```cpp
 #include "../permcomb/concurrent_perm.h"
 
-// callback can return false to stop processing
-template<typename int_type, typename container_type>
-struct empty_callback_t
-{
-    // thread_index is zero based and consecutive.
-    // Example for 2 threads, thread_index is 0 and 1
-    bool operator()(const int thread_index, const container_type& cont)
-    {
-        return true;
-    }
-};
-
 void main()
 {
     std::string results(11, 'A');
     std::iota(results.begin(), results.end(), 'A');
     
-    typedef int64_t int_type;
-    int_type thread_cnt = 2;
+    int64_t thread_cnt = 2;
 
-    typedef empty_callback_t<int_type, decltype(results)> callback_t;
-    concurrent_perm::compute_all_perm(thread_cnt, results, callback_t());
+    typedef empty_callback_t<decltype(results)> callback_t;
+    concurrent_perm::compute_all_perm(thread_cnt, results, 
+		[](const int thread_index, const std::string& cont) 
+			{return true;} );
 }
 ```
 
@@ -75,30 +64,19 @@ Example on compute_all_comb
 ```cpp
 #include "../permcomb/concurrent_comb.h"
 
-// callback can return false to stop processing
-template<typename int_type, typename container_type>
-struct empty_callback_t
-{
-    // thread_index is zero based and consecutive.
-    // Example for 2 threads, thread_index is 0 and 1
-    bool operator()(const int thread_index, uint32_t fullset,
-        uint32_t subset, const container_type& cont)
-    {
-        return true;
-    }
-};
-
 void main()
 {
     std::vector<int> fullset_vec(20);
     std::iota(fullset_vec.begin(), fullset_vec.end(), 0);
     uint32_t subset = 10;
     
-    typedef int64_t int_type;
-    int_type thread_cnt = 1;
+    int64_t thread_cnt = 1;
     
-    typedef empty_callback_t<int_type, decltype(fullset_vec)> callback_t;
-    concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, callback_t());
+    typedef empty_callback_t<decltype(fullset_vec)> callback_t;
+    concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, 
+		[] (const int thread_index, uint32_t fullset,
+			uint32_t subset, const std::vector<int>& cont) 
+			{return true;});
 }
 ```
 

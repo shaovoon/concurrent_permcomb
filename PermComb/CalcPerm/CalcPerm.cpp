@@ -77,7 +77,7 @@ bool how_to_use_thread_index_perm(int_type thread_cnt, uint32_t set_size)
 }
 
 // return false to stop processing
-template<typename int_type, typename container_type>
+template<typename container_type>
 struct empty_callback_t
 {
 	bool operator()(const int thread_index, const container_type& cont)
@@ -121,7 +121,7 @@ void benchmark_perm()
 
 	int_type thread_cnt = 1;
 
-	typedef empty_callback_t<int_type, decltype(results)> callback_t;
+	typedef empty_callback_t<decltype(results)> callback_t;
 
 	stopwatch.start_timing("1 thread(s)");
 	thread_cnt = 1;
