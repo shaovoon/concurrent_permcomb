@@ -102,7 +102,9 @@ next_permutation:  163ms
      2 thread(s):   95ms
      3 thread(s):   48ms
      4 thread(s):   50ms
+```
 
+```
 Results for combination of 14 out of 28 elements:
 Total combinations computed: 40,116,600 - 1
 int128_t type used.
