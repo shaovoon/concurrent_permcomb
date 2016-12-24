@@ -94,8 +94,8 @@ struct empty_callback_t
 };
 
 //typedef boost::multiprecision::cpp_int int_type;
-typedef boost::multiprecision::int128_t int_type;
-//typedef int64_t int_type;
+//typedef boost::multiprecision::int128_t int_type;
+typedef int64_t int_type;
 
 int main(int argc, char* argv[])
 {
@@ -111,9 +111,9 @@ int main(int argc, char* argv[])
 
 void benchmark_comb()
 {
-	std::vector<int> fullset_vec(28);
+	std::vector<int> fullset_vec(20);
 	std::iota(fullset_vec.begin(), fullset_vec.end(), 0);
-	uint32_t subset = 14;
+	uint32_t subset = 10;
 
 	timer stopwatch;
 	{
