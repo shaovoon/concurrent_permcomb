@@ -7,7 +7,8 @@ Upcoming C++17 Concurrent STL algorithms does not include parallel next_permutat
 **Note**: Work is still ongoing. Library is not yet submitted for Boost review and is not part of Boost Library.
 
 ### Requirement
-C++11
+
+C++14
 
 **Optional**: [Boost Multiprecision](http://www.boost.org/doc/libs/1_62_0/libs/multiprecision/doc/html/index.html)
 **Note**: Library need Boost Multiprecision for factorial(n) where n > 20. You either use the arbitrary integer(most safe) or fixed width big integer to accommodate the largest factorial. 
@@ -23,6 +24,16 @@ boost::multiprecision::int256_t;
 - Visual C++ 2015
 - GCC 5.4 Ubuntu 16.04
 - Clang 3.8 Ubuntu 16.04
+
+### Build examples with GCC and Clang
+
+```
+g++     CalcPerm.cpp -std=c++14 -lpthread -O2
+g++     CalcPerm.cpp -std=c++14 -lpthread -O2
+
+clang++ CalcComb.cpp -std=c++14 -lpthread -O2
+clang++ CalcComb.cpp -std=c++14 -lpthread -O2
+```
 
 ### Formulae
 
@@ -122,7 +133,7 @@ Cancellation is not directly supported but every callback can return false to st
 
 ### Benchmark results
 
-Note: there is some overhead.
+Intel i7 6700 CPU with 16 GB RAM with Visual C++ on Windows 10
 
 ```
 Results for permutation of 11 elements:
@@ -147,3 +158,7 @@ next_combination:  608ms
      3 thread(s):  222ms
      4 thread(s):  171ms
 ```
+
+### Diminishing returns on 4 threads
+
+Main suspect is the Intel i7 6700 CPU is a 4 core processor where other applications are running. Need a multicore CPU with more than 4 cores to see diminishing perf gain issue persist!
