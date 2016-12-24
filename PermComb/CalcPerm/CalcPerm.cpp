@@ -92,8 +92,8 @@ typedef int64_t int_type;
 
 int main(int argc, char* argv[])
 {
-	int_type thread_cnt = 4;
-	how_to_use_thread_index_perm(thread_cnt, 10);
+	//int_type thread_cnt = 4;
+	//how_to_use_thread_index_perm(thread_cnt, 10);
 
 	benchmark_perm();
 

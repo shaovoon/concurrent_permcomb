@@ -164,18 +164,15 @@ bool find_comb(const uint32_t fullset,
 };
 
 template<typename container_type, typename index_type, typename callback_type>
-struct comb_loop
+void comb_loop(const int thread_index, container_type& cont_full_set, container_type& cont, const index_type& start, const index_type& end, callback_type& callback)
 {
-	void operator()(const int thread_index, container_type& cont_full_set, container_type& cont, const index_type& start, const index_type& end, callback_type& callback)
+	for (index_type j = start; j < end; ++j)
 	{
-		for (index_type j = start; j < end; ++j)
-		{
-			if (!callback(thread_index, cont_full_set.size(), cont))
-				return;
-			boost::next_combination(cont_full_set.begin(), cont_full_set.end(), cont.begin(), cont.end());
-		}
+		if (!callback(thread_index, cont_full_set.size(), cont))
+			return;
+		boost::next_combination(cont_full_set.begin(), cont_full_set.end(), cont.begin(), cont.end());
 	}
-};
+}
 
 template<typename int_type, typename container_type, typename callback_type>
 void worker_thread_proc(const int_type thread_index, 
@@ -205,17 +202,17 @@ void worker_thread_proc(const int_type thread_index,
 		const int start_i = static_cast<int>(start_index);
 		const int end_i = static_cast<int>(end_index);
 
-		comb_loop<container_type, int, callback_type>()(thread_index_n, cont_fullset, vec, start_i, end_i, callback);
+		comb_loop(thread_index_n, cont_fullset, vec, start_i, end_i, callback);
 	}
 	else if (end_index <= std::numeric_limits<int64_t>::max()) // use POD counter when possible
 	{
 		const int64_t start_i = static_cast<int64_t>(start_index);
 		const int64_t end_i = static_cast<int64_t>(end_index);
-		comb_loop<container_type, int64_t, callback_type>()(thread_index_n, cont_fullset, vec, start_i, end_i, callback);
+		comb_loop(thread_index_n, cont_fullset, vec, start_i, end_i, callback);
 	}
 	else
 	{
-		comb_loop<container_type, int_type, callback_type>()(thread_index_n, cont_fullset, vec, start_index, end_index, callback);
+		comb_loop(thread_index_n, cont_fullset, vec, start_index, end_index, callback);
 	}
 }
 
