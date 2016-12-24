@@ -29,9 +29,9 @@ boost::multiprecision::int256_t;
 
 ```
 g++     CalcPerm.cpp -std=c++11 -lpthread -O2
-g++     CalcPerm.cpp -std=c++11 -lpthread -O2
+g++     CalcComb.cpp -std=c++11 -lpthread -O2
 
-clang++ CalcComb.cpp -std=c++11 -lpthread -O2
+clang++ CalcPerm.cpp -std=c++11 -lpthread -O2
 clang++ CalcComb.cpp -std=c++11 -lpthread -O2
 ```
 
