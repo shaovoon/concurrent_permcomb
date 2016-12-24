@@ -39,7 +39,7 @@ clang++ CalcComb.cpp -std=c++14 -lpthread -O2
 
 ```cpp
 Total Permutation: n!
-Total Combination: n! / r! (n - r)! 
+Total Combination: n! / (r! (n - r)!)
 ```
 
 Use compute_factorial for total permutation.
