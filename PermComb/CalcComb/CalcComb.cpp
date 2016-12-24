@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
-#include <intrin.h>
-#include <boost/multiprecision/cpp_int.hpp>
+//#include <intrin.h>
+//#include <boost/multiprecision/cpp_int.hpp>
 #include "../permcomb/concurrent_comb.h"
 #include "../common/timer.h"
 
