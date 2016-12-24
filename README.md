@@ -151,11 +151,11 @@ Results for combination of 14 out of 28 elements:
 Total combinations computed: 40,116,600 - 1
 int128_t type used.
  
-next_combination:  608ms
-     1 thread(s):  588ms
-     2 thread(s):  292ms
-     3 thread(s):  222ms
-     4 thread(s):  171ms
+next_combination:  789ms
+     1 thread(s):  808ms
+     2 thread(s):  434ms
+     3 thread(s):  316ms
+     4 thread(s):  242ms
 ```
 
 ### Diminishing returns on 4 threads

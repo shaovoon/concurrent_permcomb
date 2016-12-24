@@ -116,8 +116,8 @@ void benchmark_comb()
 
 	timer stopwatch;
 	{
-		std::string fullset_vec2(fullset_vec.begin(), fullset_vec.end());
-		std::string subset_vec(fullset_vec.begin(), fullset_vec.begin()+ subset);
+		std::vector<int> fullset_vec2(fullset_vec.begin(), fullset_vec.end());
+		std::vector<int> subset_vec(fullset_vec.begin(), fullset_vec.begin()+ subset);
 
 		stopwatch.start("next_combination");
 		while (boost::next_combination(fullset_vec2.begin(), fullset_vec2.end(), subset_vec.begin(), subset_vec.end()))

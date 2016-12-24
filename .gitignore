@@ -41,6 +41,7 @@
 *.sdf
 *.opensdf
 *.db
+*.opendb
 
 */[dD]ebug/
 */[rR]elease/
