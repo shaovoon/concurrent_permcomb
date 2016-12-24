@@ -84,6 +84,38 @@ void main()
 
 Library need to know the container type to instantiate a copy in the worker thread. From the iterator type, we have no way to know the container. iterator type is not compatible: for example string and vector iterator are not interchangeable.
 
+### How to use thread_index parameter in callback?
+
+thread_index is a zero based and consecutive number. For example when thread_cnt is 4, then thread_index would be 0, 1, 2 and 3.
+
+```cpp
+#include "../permcomb/concurrent_perm.h"
+
+void main()
+{
+    std::string results(11, 'A');
+    std::iota(results.begin(), results.end(), 'A');
+    
+    int64_t thread_cnt = 4;
+	int matched[4] = {0,0,0,0};
+
+    typedef empty_callback_t<decltype(results)> callback_t;
+    concurrent_perm::compute_all_perm(thread_cnt, results, 
+		[&matched](const int thread_index, const std::string& cont) 
+			{
+				if(...) 
+					++matched[thread_index];
+				return true;
+			} 
+		);
+			
+	int total_matched = matched[0] + matched[1] + matched[2] + matched[3];
+	// display total_matched
+}
+```
+
+I'll leave to the reader to fix false-sharing in the above example.
+
 ### Cancellation
 
 Cancellation is not directly supported but every callback can return false to stop processing.
