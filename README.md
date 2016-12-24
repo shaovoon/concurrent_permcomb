@@ -161,4 +161,4 @@ next_combination:  608ms
 
 ### Diminishing returns on 4 threads
 
-Main suspect is the Intel i7 6700 CPU is a 4 core processor where other applications are running. Need a multicore CPU with more than 4 cores to see diminishing perf gain issue persist!
+Main suspect is the Intel i7 6700 CPU is a 4 core processor where other applications are running. Need a multicore CPU with more than 4 cores to see whether diminishing perf gain issue persist!
