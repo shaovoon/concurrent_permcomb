@@ -42,7 +42,7 @@ bool how_to_use_thread_index_comb(int_type thread_cnt, uint32_t fullset_size, ui
 
 	concurrent_comb::compute_all_comb(thread_cnt, subset_size, fullset,
 		[&vecvecvec](const int thread_index, 
-			uint32_t fullset_cnt, uint32_t subset_cnt, 
+			const size_t fullset_cnt,  
 			const std::vector<uint32_t>& cont) -> bool
 		{
 			vecvecvec[(size_t)thread_index].push_back(cont);
@@ -55,7 +55,7 @@ bool how_to_use_thread_index_comb(int_type thread_cnt, uint32_t fullset_size, ui
 	do
 	{
 		vecvec.push_back(std::vector<uint32_t>(subset.begin(), subset.end()));
-	} while (stdcomb::next_combination(fullset.begin(), fullset.end(), subset.begin(), subset.end()));
+	} while (boost::next_combination(fullset.begin(), fullset.end(), subset.begin(), subset.end()));
 
 	// compare results
 	size_t cnt = 0;
@@ -86,8 +86,7 @@ bool how_to_use_thread_index_comb(int_type thread_cnt, uint32_t fullset_size, ui
 template<typename container_type>
 struct empty_callback_t
 {
-	bool operator()(const int thread_index, uint32_t fullset,
-		uint32_t subset, const container_type& cont)
+	bool operator()(const int thread_index, const size_t fullset_size, const container_type& cont)
 	{
 		return true;
 	}
@@ -121,7 +120,7 @@ void benchmark_comb()
 		std::string subset_vec(fullset_vec.begin(), fullset_vec.begin()+ subset);
 
 		stopwatch.start("next_combination");
-		while (stdcomb::next_combination(fullset_vec2.begin(), fullset_vec2.end(), subset_vec.begin(), subset_vec.end()))
+		while (boost::next_combination(fullset_vec2.begin(), fullset_vec2.end(), subset_vec.begin(), subset_vec.end()))
 		{
 
 		}
@@ -165,9 +164,9 @@ void test_find_comb(uint32_t fullset, uint32_t subset)
 	std::iota(results2.begin(), results2.end(), 0);
 
 	uint32_t nTotal = 0;
-	if (!concurrent_comb::find_total_comb(fullset, subset, nTotal))
+	if (!concurrent_comb::compute_total_comb(fullset, subset, nTotal))
 	{
-		std::cerr << "find_total_comb() returns false" << std::endl;
+		std::cerr << "compute_total_comb() returns false" << std::endl;
 		return;
 	}
 
@@ -186,7 +185,7 @@ void test_find_comb(uint32_t fullset, uint32_t subset)
 				display(results1);
 			}
 		}
-		stdcomb::next_combination(fullset_vec.begin(), fullset_vec.end(), results2.begin(), results2.end());
+		boost::next_combination(fullset_vec.begin(), fullset_vec.end(), results2.begin(), results2.end());
 	}
 }
 

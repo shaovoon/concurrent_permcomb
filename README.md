@@ -42,8 +42,8 @@ Total Permutation: n!
 Total Combination: n! / (r! (n - r)!)
 ```
 
-Use compute_factorial for total permutation.
-Use find_total_comb for total combination.
+Use compute_factorial  for total permutation.
+Use compute_total_comb for total combination.
 
 ### Limitation
 
@@ -85,8 +85,7 @@ void main()
     
     typedef empty_callback_t<decltype(fullset_vec)> callback_t;
     concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, 
-		[] (const int thread_index, uint32_t fullset,
-			uint32_t subset, const std::vector<int>& cont) 
+		[] (const int thread_index, uint32_t fullset, const std::vector<int>& cont) 
 			{return true;});
 }
 ```

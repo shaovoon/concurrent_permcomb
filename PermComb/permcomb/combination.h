@@ -32,7 +32,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 #define __COMBINATION_H__
 
 
-namespace stdcomb
+namespace boost
 {
 
 // Non recursive template function

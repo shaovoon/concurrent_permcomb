@@ -53,7 +53,7 @@ void find_range( const uint32_t &Min, const uint32_t &Max, int_type& result )
 }
 
 template<typename int_type>
-bool find_total_comb( const uint32_t fullset, const uint32_t subset, int_type& total )
+bool compute_total_comb( const uint32_t fullset, const uint32_t subset, int_type& total )
 {
 	if (subset > fullset)
 		return false;
@@ -130,7 +130,7 @@ bool find_comb(const uint32_t fullset,
 			uint32_t y;
 			for( y=0; y<loop; ++y )
 			{
-				if (!find_total_comb(remaining_set, remaining_comb, total_comb))
+				if (!compute_total_comb(remaining_set, remaining_comb, total_comb))
 					return false;
 
 				total_comb += prev;
@@ -163,6 +163,20 @@ bool find_comb(const uint32_t fullset,
 	return true;
 };
 
+template<typename container_type, typename index_type, typename callback_type>
+struct comb_loop
+{
+	void operator()(const int thread_index, container_type& cont_full_set, container_type& cont, const index_type& start, const index_type& end, callback_type& callback)
+	{
+		for (index_type j = start; j < end; ++j)
+		{
+			if (!callback(thread_index, cont_full_set.size(), cont))
+				return;
+			boost::next_combination(cont_full_set.begin(), cont_full_set.end(), cont.begin(), cont.end());
+		}
+	}
+};
+
 template<typename int_type, typename container_type, typename callback_type>
 void worker_thread_proc(const int_type thread_index, 
 						const container_type& cont,
@@ -185,37 +199,23 @@ void worker_thread_proc(const int_type thread_index,
 	{
 		vec.push_back(cont[results[i]]);
 	}
-	container_type cont2(cont.begin(), cont.end());
+	container_type cont_fullset(cont.begin(), cont.end());
 	if(end_index <= std::numeric_limits<int>::max()) // use POD counter when possible
 	{ 
 		const int start_i = static_cast<int>(start_index);
 		const int end_i = static_cast<int>(end_index);
-		for (int j = start_i; j < end_i; ++j)
-		{
-			if (!callback(thread_index_n, cont.size(), subset, vec))
-				return;
-			stdcomb::next_combination(cont2.begin(), cont2.end(), vec.begin(), vec.end());
-		}
+
+		comb_loop<container_type, int, callback_type>()(thread_index_n, cont_fullset, vec, start_i, end_i, callback);
 	}
 	else if (end_index <= std::numeric_limits<int64_t>::max()) // use POD counter when possible
 	{
 		const int64_t start_i = static_cast<int64_t>(start_index);
 		const int64_t end_i = static_cast<int64_t>(end_index);
-		for (int64_t j = start_i; j < end_i; ++j)
-		{
-			if (!callback(thread_index_n, cont.size(), subset, vec))
-				return;
-			stdcomb::next_combination(cont2.begin(), cont2.end(), vec.begin(), vec.end());
-		}
+		comb_loop<container_type, int64_t, callback_type>()(thread_index_n, cont_fullset, vec, start_i, end_i, callback);
 	}
 	else
 	{
-		for (int_type j = start_index; j < end_index; ++j)
-		{
-			if (!callback(thread_index_n, cont.size(), subset, vec))
-				return;
-			stdcomb::next_combination(cont2.begin(), cont2.end(), vec.begin(), vec.end());
-		}
+		comb_loop<container_type, int_type, callback_type>()(thread_index_n, cont_fullset, vec, start_index, end_index, callback);
 	}
 }
 
@@ -223,7 +223,7 @@ template<typename int_type, typename container_type, typename callback_type>
 bool compute_all_comb(int_type thread_cnt, uint32_t subset, const container_type& cont, callback_type callback)
 {
 	int_type total_comb=0; 
-	if (!find_total_comb(cont.size(), subset, total_comb))
+	if (!compute_total_comb(cont.size(), subset, total_comb))
 		return false;
 
 	int_type each_thread_elem_cnt = total_comb / thread_cnt;
