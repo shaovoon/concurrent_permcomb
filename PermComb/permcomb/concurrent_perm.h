@@ -145,11 +145,38 @@ void worker_thread_proc(const int_type& thread_index,
 		}
 	}
 
-	for (int_type j = start_index; j<end_index; ++j)
+	if (end_index <= std::numeric_limits<int>::max()) // use POD counter when possible
 	{
-		if (!callback(thread_index_n, vec))
-			return;
-		std::next_permutation(vec.begin(), vec.end());
+		const int start_i = static_cast<int>(start_index);
+		const int end_i = static_cast<int>(end_index);
+
+		for (int j = start_i; j < end_i; ++j)
+		{
+			if (!callback(thread_index_n, vec))
+				return;
+			std::next_permutation(vec.begin(), vec.end());
+		}
+	}
+	else if (end_index <= std::numeric_limits<int64_t>::max()) // use POD counter when possible
+	{
+		const int64_t start_i = static_cast<int64_t>(start_index);
+		const int64_t end_i = static_cast<int64_t>(end_index);
+
+		for (int64_t j = start_i; j < end_i; ++j)
+		{
+			if (!callback(thread_index_n, vec))
+				return;
+			std::next_permutation(vec.begin(), vec.end());
+		}
+	}
+	else
+	{
+		for (int_type j = start_index; j < end_index; ++j)
+		{
+			if (!callback(thread_index_n, vec))
+				return;
+			std::next_permutation(vec.begin(), vec.end());
+		}
 	}
 }
 
