@@ -8,7 +8,7 @@ Upcoming C++17 Concurrent STL algorithms does not include parallel next_permutat
 
 ### Requirement
 
-C++14
+**Required**: C++11
 
 **Optional**: [Boost Multiprecision](http://www.boost.org/doc/libs/1_62_0/libs/multiprecision/doc/html/index.html)
 **Note**: Library need Boost Multiprecision for factorial(n) where n > 20. You either use the arbitrary integer(most safe) or fixed width big integer to accommodate the largest factorial. 
@@ -28,11 +28,11 @@ boost::multiprecision::int256_t;
 ### Build examples with GCC and Clang
 
 ```
-g++     CalcPerm.cpp -std=c++14 -lpthread -O2
-g++     CalcPerm.cpp -std=c++14 -lpthread -O2
+g++     CalcPerm.cpp -std=c++11 -lpthread -O2
+g++     CalcPerm.cpp -std=c++11 -lpthread -O2
 
-clang++ CalcComb.cpp -std=c++14 -lpthread -O2
-clang++ CalcComb.cpp -std=c++14 -lpthread -O2
+clang++ CalcComb.cpp -std=c++11 -lpthread -O2
+clang++ CalcComb.cpp -std=c++11 -lpthread -O2
 ```
 
 ### Formulae

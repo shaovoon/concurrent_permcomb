@@ -43,7 +43,7 @@ bool how_to_use_thread_index_comb(int_type thread_cnt, uint32_t fullset_size, ui
 	concurrent_comb::compute_all_comb(thread_cnt, subset_size, fullset,
 		[&vecvecvec](const int thread_index, 
 			uint32_t fullset_cnt, uint32_t subset_cnt, 
-			const auto& cont) -> bool
+			const std::vector<uint32_t>& cont) -> bool
 		{
 			vecvecvec[(size_t)thread_index].push_back(cont);
 			return true;

@@ -42,7 +42,7 @@ bool how_to_use_thread_index_perm(int_type thread_cnt, uint32_t set_size)
 	std::vector<std::vector< std::vector<char> > > vecvecvec((size_t)thread_cnt);
 
 	concurrent_perm::compute_all_perm(thread_cnt, results,
-		[&vecvecvec] (const int thread_index, const auto& cont) -> bool
+		[&vecvecvec] (const int thread_index, const std::vector<char>& cont) -> bool
 	{
 		vecvecvec[thread_index].push_back(cont);
 		return true;
