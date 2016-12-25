@@ -108,7 +108,6 @@ void main()
     int64_t thread_cnt = 4;
 	int matched[4] = {0,0,0,0};
 
-    typedef empty_callback_t<decltype(results)> callback_t;
     concurrent_perm::compute_all_perm(thread_cnt, results, 
 		[&matched](const int thread_index, const std::string& cont) 
 			{
