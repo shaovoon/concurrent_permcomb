@@ -128,6 +128,10 @@ I'll leave to the reader to fix false-sharing in the above example.
 
 Cancellation is not directly supported but every callback can return `false` to cancel processing.
 
+### How many threads are spawned?
+
+**Answer**: `thread_cnt` - 1. For `thread_cnt` = 4, 3 threads will be spawned while main thread is used to compute the 4th batch. For `thread_cnt` = 1, no threads is spawned, all work is done in the main thread.
+
 ### Benchmark results
 
 Intel i7 6700 CPU with 16 GB RAM with Visual C++ on Windows 10
