@@ -63,7 +63,6 @@ void main()
     
     int64_t thread_cnt = 2;
 
-    typedef empty_callback_t<decltype(results)> callback_t;
     concurrent_perm::compute_all_perm(thread_cnt, results, 
 		[](const int thread_index, const std::string& cont) 
 			{return true;} );
@@ -81,9 +80,8 @@ void main()
     std::iota(fullset_vec.begin(), fullset_vec.end(), 0);
     uint32_t subset = 10;
     
-    int64_t thread_cnt = 1;
+    int64_t thread_cnt = 2;
     
-    typedef empty_callback_t<decltype(fullset_vec)> callback_t;
     concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, 
 		[] (const int thread_index, uint32_t fullset, const std::vector<int>& cont) 
 			{return true;});
