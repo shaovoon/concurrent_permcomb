@@ -2,7 +2,7 @@
 
 ### Primary motivation
 
-Upcoming C++17 Concurrent STL algorithms does not include parallel next_permutation and next_combination. compute_all_perm and compute_all_comb make use of next_permutation and next_combination underneath to find all the permutations and combinations. Right now, function overload with predicate is not available. So < operator and == operator must be provided for next_permutation and next_combination respectively.
+Upcoming C++17 Concurrent STL algorithms does not include parallel `next_permutation` and next_combination. compute_all_perm and compute_all_comb make use of next_permutation and next_combination underneath to find all the permutations and combinations. Right now, function overload with predicate is not available. So < operator and == operator must be provided for next_permutation and next_combination respectively.
 
 **Note**: Work is still ongoing. Library is not yet submitted for Boost review and is not part of Boost Library.
 
