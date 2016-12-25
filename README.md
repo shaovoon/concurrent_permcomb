@@ -91,7 +91,7 @@ void main()
 
 ### Why not pass in begin and end iterators?
 
-Library need to know the container type to instantiate a copy in the worker thread. From the iterator type, we have no way to know the container. Iterator type is not compatible: for example `string` and `vector` iterator are not interchangeable; It is not right that user pass `string` iterator but library pass vector iterator to callback.
+Library need to know the container type to instantiate a copy in the worker thread. From the iterator type, we have no way to know the container. Iterator type is not compatible: for example `string` and `vector` iterator are not interchangeable; It is not right that user pass `string` iterator but library pass `vector` iterator to callback.
 
 ### How to use thread_index parameter in callback?
 
