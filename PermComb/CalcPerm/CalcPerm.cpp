@@ -7,6 +7,8 @@
 #include "../common/timer.h"
 
 void test_find_perm(uint32_t PermSetSize);
+void unit_test();
+void unit_test_threaded();
 void benchmark_perm();
 
 template<typename T>
@@ -34,8 +36,10 @@ void display(std::vector<T>& results)
 }
 
 template<typename int_type>
-bool how_to_use_thread_index_perm(int_type thread_cnt, uint32_t set_size)
+bool test_threaded_perm(int_type thread_cnt, uint32_t set_size)
 {
+	std::cout << "test_threaded_perm(" << thread_cnt << ", " << set_size << ") starting" << std::endl;
+
 	std::vector<char> results(set_size);
 	std::iota(results.begin(), results.end(), 'A');
 
@@ -56,13 +60,15 @@ bool how_to_use_thread_index_perm(int_type thread_cnt, uint32_t set_size)
 
 	// compare results
 	size_t cnt = 0;
+	bool error = false;
 	for (size_t i = 0; i < vecvecvec.size(); ++i)
 	{
 		for (size_t j = 0; j < vecvecvec[i].size(); ++j, ++cnt)
 		{
 			if (!compare_vec(vecvec[cnt], vecvecvec[i][j]))
 			{
-				std::cout << "Perm at " << cnt << " is not the same!" << std::endl;
+				error = true;
+				std::cerr << "Perm at " << cnt << " is not the same!" << std::endl;
 
 				display(vecvec[cnt]);
 				display(vecvecvec[i][j]);
@@ -71,7 +77,7 @@ bool how_to_use_thread_index_perm(int_type thread_cnt, uint32_t set_size)
 			}
 		}
 	}
-	std::cout << "how_to_use_thread_index_perm done! thread_cnt: " << thread_cnt << ", set_size: " << set_size << std::endl;
+	std::cout << "test_threaded_perm(" << thread_cnt << ", " << set_size << ") finished with" << ((error) ? " errors" : " no errors") << std::endl;
 
 	return true;
 }
@@ -92,12 +98,11 @@ typedef int64_t int_type;
 
 int main(int argc, char* argv[])
 {
-	//int_type thread_cnt = 4;
-	//how_to_use_thread_index_perm(thread_cnt, 10);
+	//benchmark_perm();
 
-	benchmark_perm();
+	//unit_test();
 
-	//test_find_perm(3);
+	unit_test_threaded();
 
 	return 0;
 }
@@ -146,6 +151,7 @@ void benchmark_perm()
 
 void test_find_perm(uint32_t set_size)
 {
+	std::cout << "test_find_perm(" << set_size << ") starting" << std::endl;
 	std::vector<uint32_t> results1;
 	std::vector<uint32_t> results2(set_size);
 	std::iota(results2.begin(), results2.end(), 0);
@@ -153,23 +159,49 @@ void test_find_perm(uint32_t set_size)
 	int factorial=0; 
 	concurrent_perm::compute_factorial( set_size, factorial );
 
+	bool error = false;
 	for(int j=0; j<factorial; ++j )
 	{
 		if(concurrent_perm::find_perm(set_size, j, results1))
 		{
 			if(compare_vec(results1, results2)==false)
 			{
-				std::cout << "Perm at " << j << " is not the same!" << std::endl;
+				error = true;
+				std::cerr << "Perm at " << j << " is not the same!" << std::endl;
 				display(results1);
 				display(results2);
+				break;
 			}
 			else
 			{
-				display(results1);
+				//display(results1);
 			}
 		}
 		std::next_permutation(results2.begin(), results2.end());
 	}
+	std::cout << "test_find_perm(" << set_size << ") finished with" << ((error)?" errors":" no errors") <<  std::endl;
 }
 
+void unit_test()
+{
+	test_find_perm(3);
+	test_find_perm(4);
+	test_find_perm(5);
+	test_find_perm(6);
+	test_find_perm(7);
+	test_find_perm(8);
+	test_find_perm(9);
+	test_find_perm(10);
+}
+
+void unit_test_threaded()
+{
+	int_type thread_cnt = 4;
+	test_threaded_perm(thread_cnt, 5);
+	test_threaded_perm(thread_cnt, 6);
+	test_threaded_perm(thread_cnt, 7);
+	test_threaded_perm(thread_cnt, 8);
+	test_threaded_perm(thread_cnt, 9);
+	test_threaded_perm(thread_cnt, 10);
+}
 

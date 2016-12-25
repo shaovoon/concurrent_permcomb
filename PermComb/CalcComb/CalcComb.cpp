@@ -6,6 +6,8 @@
 #include "../common/timer.h"
 
 void test_find_comb(uint32_t fullset, uint32_t subset);
+void unit_test();
+void unit_test_threaded();
 void benchmark_comb();
 
 template<typename T>
@@ -33,8 +35,10 @@ void display(std::vector<T>& results)
 }
 
 template<typename int_type>
-bool how_to_use_thread_index_comb(int_type thread_cnt, uint32_t fullset_size, uint32_t subset_size)
+bool test_threaded_comb(int_type thread_cnt, uint32_t fullset_size, uint32_t subset_size)
 {
+	std::cout << "test_threaded_comb(" << thread_cnt << ", " << fullset_size << ", " << subset_size << ") starting" << std::endl;
+
 	std::vector<uint32_t> fullset(fullset_size);
 	std::iota(fullset.begin(), fullset.end(), 0);
 
@@ -59,12 +63,15 @@ bool how_to_use_thread_index_comb(int_type thread_cnt, uint32_t fullset_size, ui
 
 	// compare results
 	size_t cnt = 0;
+	bool error = false;
 	for (size_t i = 0; i < vecvecvec.size(); ++i)
 	{
 		for (size_t j = 0; j < vecvecvec[i].size(); ++j, ++cnt)
 		{
 			if (!compare_vec(vecvec[cnt], vecvecvec[i][j]))
 			{
+				error = true;
+
 				std::cout << "Perm at " << cnt << " is not the same!" << std::endl;
 
 				display(vecvec[cnt]);
@@ -74,10 +81,9 @@ bool how_to_use_thread_index_comb(int_type thread_cnt, uint32_t fullset_size, ui
 			}
 		}
 	}
-	std::cout << "how_to_use_thread_index_comb done! thread_cnt: " << thread_cnt 
-		<< ", fullset_size: " << fullset_size 
-		<< ", subset_size: "  << subset_size 
-		<< std::endl;
+
+	std::cout << "test_threaded_comb(" << thread_cnt << ", " << fullset_size << ", " << subset_size << 
+		") finished with" << ((error) ? " errors" : " no errors") << std::endl;
 
 	return true;
 }
@@ -98,12 +104,11 @@ typedef int64_t int_type;
 
 int main(int argc, char* argv[])
 {
-	//int_type thread_cnt = 3;
-	//how_to_use_thread_index_comb(thread_cnt, 10, 5);
+	//benchmark_comb();
 
-	benchmark_comb();
+	//unit_test();
 
-	//test_find_comb(5, 2);
+	unit_test_threaded();
 
 	return 0;
 }
@@ -155,6 +160,7 @@ void benchmark_comb()
 
 void test_find_comb(uint32_t fullset, uint32_t subset)
 {
+	std::cout << "test_find_comb(" << fullset << "," << subset << ") starting" << std::endl;
 	std::vector<uint32_t> fullset_vec(fullset);
 	std::vector<uint32_t> results1(subset);
 	std::vector<uint32_t> results2(subset);
@@ -170,22 +176,58 @@ void test_find_comb(uint32_t fullset, uint32_t subset)
 		return;
 	}
 
+	bool error = false;
 	for(uint32_t j=0; j<nTotal; ++j )
 	{
 		if(concurrent_comb::find_comb(fullset, subset, j, results1))
 		{
 			if(compare_vec(results1, results2)==false)
 			{
+				error = true;
 				std::cout << "Perm at " << j << " is not the same!" << std::endl;
 				display(results1);
 				display(results2);
 			}
 			else
 			{
-				display(results1);
+				//display(results1);
 			}
 		}
 		boost::next_combination(fullset_vec.begin(), fullset_vec.end(), results2.begin(), results2.end());
 	}
+	std::cout << "test_find_comb(" << fullset << "," << subset << ") finished with" << ((error) ? " errors" : " no errors") << std::endl;
 }
+
+void unit_test()
+{
+	test_find_comb(3,2);
+	test_find_comb(4,2);
+	test_find_comb(5,3);
+	test_find_comb(6,3);
+	test_find_comb(7,4);
+	test_find_comb(8,4);
+	test_find_comb(9,5);
+	test_find_comb(10,5);
+	test_find_comb(11,6);
+	test_find_comb(12,6);
+	test_find_comb(13,7);
+	test_find_comb(14,7);
+	test_find_comb(15,8);
+	test_find_comb(16,8);
+	test_find_comb(17,9);
+	test_find_comb(18,9);
+}
+
+void unit_test_threaded()
+{
+	int_type thread_cnt = 4;
+	test_threaded_comb(thread_cnt, 5, 3);
+	test_threaded_comb(thread_cnt, 6, 3);
+	test_threaded_comb(thread_cnt, 7, 4);
+	test_threaded_comb(thread_cnt, 8, 4);
+	test_threaded_comb(thread_cnt, 9, 5);
+	test_threaded_comb(thread_cnt, 10, 5);
+}
+
+
 
