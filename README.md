@@ -126,7 +126,7 @@ I'll leave to the reader to fix false-sharing in the above example.
 
 ### Cancellation
 
-Cancellation is not directly supported but every callback can return `false` to stop processing.
+Cancellation is not directly supported but every callback can return `false` to cancel processing.
 
 ### Benchmark results
 
