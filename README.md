@@ -95,7 +95,7 @@ Library need to know the container type to instantiate a copy in the worker thre
 
 ### How to use thread_index parameter in callback?
 
-`thread_index` is a zero based and consecutive number. For example when `thread_cnt` is 4, then `thread_index` would be [0..3]. Data type of 'thread_cnt' has to be a type large enough to hold the largest factorial required.
+`thread_index` is a zero based and consecutive number. For example when `thread_cnt` is 4, then `thread_index` would be [0..3]. Data type of `thread_cnt` has to be a type large enough to hold the largest factorial required.
 
 ```cpp
 #include "../permcomb/concurrent_perm.h"
