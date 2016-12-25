@@ -2,7 +2,7 @@
 
 ### Primary motivation
 
-Upcoming C++17 Concurrent STL algorithms does not include parallel `next_permutation` and next_combination. compute_all_perm and compute_all_comb make use of next_permutation and next_combination underneath to find all the permutations and combinations. Right now, function overload with predicate is not available. So < operator and == operator must be provided for next_permutation and next_combination respectively.
+Upcoming C++17 Concurrent STL algorithms does not include parallel `next_permutation` and `next_combination`. `compute_all_perm` and `compute_all_comb` make use of `next_permutation` and `next_combination` underneath to find all the permutations and combinations. Right now, function overload with predicate is not available. So `<` operator and `==` operator must be provided for `next_permutation` and `next_combination` respectively.
 
 **Note**: Work is still ongoing. Library is not yet submitted for Boost review and is not part of Boost Library.
 
@@ -47,11 +47,11 @@ Use compute_total_comb for total combination.
 
 ### Limitation
 
-next_permutation supports duplicate elements but compute_all_perm and compute_all_comb do not. Make sure every element is unique.
+`next_permutation` supports duplicate elements but `compute_all_perm` and `compute_all_comb` do not. Make sure every element is unique.
 
 ### Examples
 
-Example on compute_all_perm
+Example on `compute_all_perm`
 
 ```cpp
 #include "../permcomb/concurrent_perm.h"
@@ -69,7 +69,7 @@ void main()
 }
 ```
 
-Example on compute_all_comb
+Example on `compute_all_comb`
 
 ```cpp
 #include "../permcomb/concurrent_comb.h"
@@ -90,11 +90,11 @@ void main()
 
 ### Why not pass in begin and end iterators?
 
-Library need to know the container type to instantiate a copy in the worker thread. From the iterator type, we have no way to know the container. iterator type is not compatible: for example string and vector iterator are not interchangeable.
+Library need to know the container type to instantiate a copy in the worker thread. From the iterator type, we have no way to know the container. iterator type is not compatible: for example `string` and `vector` iterator are not interchangeable.
 
 ### How to use thread_index parameter in callback?
 
-thread_index is a zero based and consecutive number. For example when thread_cnt is 4, then thread_index would be 0, 1, 2 and 3.
+`thread_index` is a zero based and consecutive number. For example when `thread_cnt` is 4, then `thread_index` would be 0, 1, 2 and 3.
 
 ```cpp
 #include "../permcomb/concurrent_perm.h"
@@ -126,7 +126,7 @@ I'll leave to the reader to fix false-sharing in the above example.
 
 ### Cancellation
 
-Cancellation is not directly supported but every callback can return false to stop processing.
+Cancellation is not directly supported but every callback can return `false` to stop processing.
 
 ### Benchmark results
 
