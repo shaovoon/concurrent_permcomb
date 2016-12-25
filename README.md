@@ -42,8 +42,9 @@ Total Permutation: n!
 Total Combination: n! / (r! (n - r)!)
 ```
 
-Use compute_factorial  for total permutation.
-Use compute_total_comb for total combination.
+Use `compute_factorial`  for total permutation.
+
+Use `compute_total_comb` for total combination.
 
 ### Limitation
 
@@ -94,7 +95,7 @@ Library need to know the container type to instantiate a copy in the worker thre
 
 ### How to use thread_index parameter in callback?
 
-`thread_index` is a zero based and consecutive number. For example when `thread_cnt` is 4, then `thread_index` would be 0, 1, 2 and 3.
+`thread_index` is a zero based and consecutive number. For example when `thread_cnt` is 4, then `thread_index` would be [0..3]
 
 ```cpp
 #include "../permcomb/concurrent_perm.h"
