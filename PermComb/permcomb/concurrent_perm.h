@@ -200,15 +200,10 @@ bool compute_all_perm(int_type thread_cnt, const container_type& cont, callback_
 			std::bind(worker_thread_proc<int_type, container_type, callback_type, predicate_type>, i, cont, start_index, end_index, callback, pred))));
 	}
 
-	bulk = each_thread_elem_cnt;
-	if( thread_cnt == 1 && remainder > 0 )
-	{
-		bulk += remainder;
-	}
-
 	int_type start_index = 0; 
 	int_type end_index = bulk;
-	worker_thread_proc<int_type, container_type, callback_type, predicate_type>( 0, cont, start_index, end_index, callback, pred);
+	int_type thread_index = 0;
+	worker_thread_proc<int_type, container_type, callback_type, predicate_type>(thread_index, cont, start_index, end_index, callback, pred);
 
 	for(size_t i=0; i<threads.size(); ++i)
 	{

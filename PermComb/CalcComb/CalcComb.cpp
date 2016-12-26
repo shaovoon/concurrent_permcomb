@@ -160,13 +160,13 @@ typedef int64_t int_type;
 
 int main(int argc, char* argv[])
 {
-	//benchmark_comb();
+	benchmark_comb();
 
 	//unit_test();
 
 	//unit_test_threaded();
 
-	unit_test_threaded_predicate();
+	//unit_test_threaded_predicate();
 
 	return 0;
 }

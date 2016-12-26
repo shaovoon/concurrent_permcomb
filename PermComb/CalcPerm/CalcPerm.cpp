@@ -151,13 +151,13 @@ typedef int64_t int_type;
 
 int main(int argc, char* argv[])
 {
-	//benchmark_perm();
+	benchmark_perm();
 
 	//unit_test();
 
 	//unit_test_threaded();
 
-	unit_test_threaded_predicate();
+	//unit_test_threaded_predicate();
 
 	return 0;
 }

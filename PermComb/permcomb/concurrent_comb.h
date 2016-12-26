@@ -262,12 +262,6 @@ bool compute_all_comb(int_type thread_cnt, uint32_t subset, const container_type
 			std::bind(worker_thread_proc<int_type, container_type, callback_type, predicate_type>, i, cont, start_index, end_index, subset, callback, pred))));
 	}
 
-	bulk = each_thread_elem_cnt;
-	if( thread_cnt == 1 && remainder > 0 )
-	{
-		bulk += remainder;
-	}
-
 	int_type start_index = 0; 
 	int_type end_index = bulk;
 	int_type thread_index=0;
