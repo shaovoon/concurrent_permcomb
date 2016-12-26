@@ -48,9 +48,9 @@ Total Permutation: n!
 Total Combination: n! / (r! (n - r)!)
 ```
 
-Use `compute_factorial`  for compute total permutation count.
+Use `compute_factorial`  to calculate total permutation count.
 
-Use `compute_total_comb` for compute total combination count.
+Use `compute_total_comb` to calculate total combination count.
 
 ### Limitation
 
