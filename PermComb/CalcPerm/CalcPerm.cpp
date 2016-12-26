@@ -9,6 +9,7 @@
 void test_find_perm(uint32_t PermSetSize);
 void unit_test();
 void unit_test_threaded();
+void unit_test_threaded_predicate();
 void benchmark_perm();
 
 template<typename T>
@@ -33,6 +34,58 @@ void display(std::vector<T>& results)
 		std::cout << results[i] << ", ";
 	}
 	std::cout << std::endl;
+}
+
+template<typename int_type>
+bool test_threaded_perm_predicate(int_type thread_cnt, uint32_t set_size)
+{
+	std::cout << "test_threaded_perm_predicate(" << thread_cnt << ", " << set_size << ") starting" << std::endl;
+
+	std::vector<char> results(set_size);
+	std::iota(results.begin(), results.end(), 'A');
+
+	std::vector<std::vector< std::vector<char> > > vecvecvec((size_t)thread_cnt);
+
+	concurrent_perm::compute_all_perm(thread_cnt, results,
+		[&vecvecvec](const int thread_index, const std::vector<char>& cont) -> bool
+	{
+		vecvecvec[thread_index].push_back(cont);
+		return true;
+	},
+		[](char a, char b)
+	{
+		return a < b;
+	}
+	);
+
+	std::vector< std::vector<char> > vecvec;
+	do
+	{
+		vecvec.push_back(std::vector<char>(results.begin(), results.end()));
+	} while (std::next_permutation(results.begin(), results.end(), [](char a, char b) { return a < b; }));
+
+	// compare results
+	size_t cnt = 0;
+	bool error = false;
+	for (size_t i = 0; i < vecvecvec.size(); ++i)
+	{
+		for (size_t j = 0; j < vecvecvec[i].size(); ++j, ++cnt)
+		{
+			if (!compare_vec(vecvec[cnt], vecvecvec[i][j]))
+			{
+				error = true;
+				std::cerr << "Perm at " << cnt << " is not the same!" << std::endl;
+
+				display(vecvec[cnt]);
+				display(vecvecvec[i][j]);
+
+				return false;
+			}
+		}
+	}
+	std::cout << "test_threaded_perm_predicate(" << thread_cnt << ", " << set_size << ") finished with" << ((error) ? " errors" : " no errors") << std::endl;
+
+	return true;
 }
 
 template<typename int_type>
@@ -102,7 +155,9 @@ int main(int argc, char* argv[])
 
 	//unit_test();
 
-	unit_test_threaded();
+	//unit_test_threaded();
+
+	unit_test_threaded_predicate();
 
 	return 0;
 }
@@ -205,3 +260,13 @@ void unit_test_threaded()
 	test_threaded_perm(thread_cnt, 10);
 }
 
+void unit_test_threaded_predicate()
+{
+	int_type thread_cnt = 4;
+	test_threaded_perm_predicate(thread_cnt, 5);
+	test_threaded_perm_predicate(thread_cnt, 6);
+	test_threaded_perm_predicate(thread_cnt, 7);
+	test_threaded_perm_predicate(thread_cnt, 8);
+	test_threaded_perm_predicate(thread_cnt, 9);
+	test_threaded_perm_predicate(thread_cnt, 10);
+}

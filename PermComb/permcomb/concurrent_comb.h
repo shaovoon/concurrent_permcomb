@@ -24,6 +24,11 @@
 
 namespace concurrent_comb
 {
+
+struct no_predicate_type
+{
+};
+
 template<typename int_type>
 void compute_factorial( uint32_t num, int_type& factorial )
 {
@@ -163,8 +168,21 @@ bool find_comb(const uint32_t fullset,
 	return true;
 };
 
-template<typename container_type, typename index_type, typename callback_type>
-void comb_loop(const int thread_index, container_type& cont_full_set, container_type& cont, const index_type& start, const index_type& end, callback_type& callback)
+template<typename container_type, typename index_type, typename callback_type, typename predicate_type>
+typename std::enable_if<!std::is_same<predicate_type, no_predicate_type>::value>::type 
+comb_loop(const int thread_index, container_type& cont_full_set, container_type& cont, const index_type& start, const index_type& end, callback_type& callback, predicate_type& pred)
+{
+	for (index_type j = start; j < end; ++j)
+	{
+		if (!callback(thread_index, cont_full_set.size(), cont))
+			return;
+		boost::next_combination(cont_full_set.begin(), cont_full_set.end(), cont.begin(), cont.end(), pred);
+	}
+}
+
+template<typename container_type, typename index_type, typename callback_type, typename predicate_type>
+typename std::enable_if<std::is_same<predicate_type, no_predicate_type>::value>::type 
+comb_loop(const int thread_index, container_type& cont_full_set, container_type& cont, const index_type& start, const index_type& end, callback_type& callback, predicate_type& pred)
 {
 	for (index_type j = start; j < end; ++j)
 	{
@@ -174,13 +192,14 @@ void comb_loop(const int thread_index, container_type& cont_full_set, container_
 	}
 }
 
-template<typename int_type, typename container_type, typename callback_type>
+template<typename int_type, typename container_type, typename callback_type, typename predicate_type>
 void worker_thread_proc(const int_type thread_index, 
 						const container_type& cont,
 						int_type start_index, 
 						int_type end_index, 
 						uint32_t subset, 
-						callback_type callback)
+						callback_type& callback,
+						predicate_type& pred)
 {
 	const int thread_index_n = static_cast<const int>(thread_index);
 
@@ -202,22 +221,22 @@ void worker_thread_proc(const int_type thread_index,
 		const int start_i = static_cast<int>(start_index);
 		const int end_i = static_cast<int>(end_index);
 
-		comb_loop(thread_index_n, cont_fullset, vec, start_i, end_i, callback);
+		comb_loop(thread_index_n, cont_fullset, vec, start_i, end_i, callback, pred);
 	}
 	else if (end_index <= std::numeric_limits<int64_t>::max()) // use POD counter when possible
 	{
 		const int64_t start_i = static_cast<int64_t>(start_index);
 		const int64_t end_i = static_cast<int64_t>(end_index);
-		comb_loop(thread_index_n, cont_fullset, vec, start_i, end_i, callback);
+		comb_loop(thread_index_n, cont_fullset, vec, start_i, end_i, callback, pred);
 	}
 	else
 	{
-		comb_loop(thread_index_n, cont_fullset, vec, start_index, end_index, callback);
+		comb_loop(thread_index_n, cont_fullset, vec, start_index, end_index, callback, pred);
 	}
 }
 
-template<typename int_type, typename container_type, typename callback_type>
-bool compute_all_comb(int_type thread_cnt, uint32_t subset, const container_type& cont, callback_type callback)
+template<typename int_type, typename container_type, typename callback_type, typename predicate_type = no_predicate_type>
+bool compute_all_comb(int_type thread_cnt, uint32_t subset, const container_type& cont, callback_type& callback, predicate_type pred = predicate_type())
 {
 	int_type total_comb=0; 
 	if (!compute_total_comb(cont.size(), subset, total_comb))
@@ -240,7 +259,7 @@ bool compute_all_comb(int_type thread_cnt, uint32_t subset, const container_type
 		int_type start_index = i*each_thread_elem_cnt; 
 		int_type end_index = start_index + bulk;
 		threads.push_back( std::shared_ptr<std::thread>(new std::thread(
-			std::bind(worker_thread_proc<int_type, container_type, callback_type>, i, cont, start_index, end_index, subset, callback))));
+			std::bind(worker_thread_proc<int_type, container_type, callback_type, predicate_type>, i, cont, start_index, end_index, subset, callback, pred))));
 	}
 
 	bulk = each_thread_elem_cnt;
@@ -252,7 +271,7 @@ bool compute_all_comb(int_type thread_cnt, uint32_t subset, const container_type
 	int_type start_index = 0; 
 	int_type end_index = bulk;
 	int_type thread_index=0;
-	worker_thread_proc<int_type, container_type, callback_type>( thread_index, cont, start_index, end_index, subset, callback );
+	worker_thread_proc<int_type, container_type, callback_type, predicate_type>( thread_index, cont, start_index, end_index, subset, callback, pred);
 
 	for(size_t i=0; i<threads.size(); ++i)
 	{

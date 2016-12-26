@@ -8,6 +8,7 @@
 void test_find_comb(uint32_t fullset, uint32_t subset);
 void unit_test();
 void unit_test_threaded();
+void unit_test_threaded_predicate();
 void benchmark_comb();
 
 template<typename T>
@@ -32,6 +33,61 @@ void display(std::vector<T>& results)
 		std::cout << results[i] << ", ";
 	}
 	std::cout << std::endl;
+}
+
+template<typename int_type>
+bool test_threaded_comb_predicate(int_type thread_cnt, uint32_t fullset_size, uint32_t subset_size)
+{
+	std::cout << "test_threaded_comb_predicate(" << thread_cnt << ", " << fullset_size << ", " << subset_size << ") starting" << std::endl;
+
+	std::vector<uint32_t> fullset(fullset_size);
+	std::iota(fullset.begin(), fullset.end(), 0);
+
+	std::vector<std::vector< std::vector<uint32_t> > > vecvecvec((size_t)thread_cnt);
+
+	concurrent_comb::compute_all_comb(thread_cnt, subset_size, fullset,
+		[&vecvecvec](const int thread_index,
+			const size_t fullset_cnt,
+			const std::vector<uint32_t>& cont) -> bool
+	{
+		vecvecvec[(size_t)thread_index].push_back(cont);
+		return true;
+	},
+		[](uint32_t a, uint32_t b) { return a == b; });
+
+	std::vector<uint32_t> subset(subset_size);
+	std::iota(subset.begin(), subset.end(), 0);
+	std::vector< std::vector<uint32_t> > vecvec;
+	do
+	{
+		vecvec.push_back(std::vector<uint32_t>(subset.begin(), subset.end()));
+	} while (boost::next_combination(fullset.begin(), fullset.end(), subset.begin(), subset.end(), [](uint32_t a, uint32_t b) { return a == b; }));
+
+	// compare results
+	size_t cnt = 0;
+	bool error = false;
+	for (size_t i = 0; i < vecvecvec.size(); ++i)
+	{
+		for (size_t j = 0; j < vecvecvec[i].size(); ++j, ++cnt)
+		{
+			if (!compare_vec(vecvec[cnt], vecvecvec[i][j]))
+			{
+				error = true;
+
+				std::cout << "Perm at " << cnt << " is not the same!" << std::endl;
+
+				display(vecvec[cnt]);
+				display(vecvecvec[i][j]);
+
+				return false;
+			}
+		}
+	}
+
+	std::cout << "test_threaded_comb_predicate(" << thread_cnt << ", " << fullset_size << ", " << subset_size <<
+		") finished with" << ((error) ? " errors" : " no errors") << std::endl;
+
+	return true;
 }
 
 template<typename int_type>
@@ -108,7 +164,9 @@ int main(int argc, char* argv[])
 
 	//unit_test();
 
-	unit_test_threaded();
+	//unit_test_threaded();
+
+	unit_test_threaded_predicate();
 
 	return 0;
 }
@@ -229,5 +287,15 @@ void unit_test_threaded()
 	test_threaded_comb(thread_cnt, 10, 5);
 }
 
+void unit_test_threaded_predicate()
+{
+	int_type thread_cnt = 4;
+	test_threaded_comb_predicate(thread_cnt, 5, 3);
+	test_threaded_comb_predicate(thread_cnt, 6, 3);
+	test_threaded_comb_predicate(thread_cnt, 7, 4);
+	test_threaded_comb_predicate(thread_cnt, 8, 4);
+	test_threaded_comb_predicate(thread_cnt, 9, 5);
+	test_threaded_comb_predicate(thread_cnt, 10, 5);
+}
 
 

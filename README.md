@@ -2,7 +2,9 @@
 
 ### Primary motivation
 
-Upcoming C++17 Concurrent STL algorithms does not include parallel `next_permutation` and `next_combination`. `compute_all_perm` and `compute_all_comb` make use of `next_permutation` and `next_combination` underneath to find all the permutations and combinations. Right now, function overload with predicate is not available. So `<` operator and `==` operator must be provided for `next_permutation` and `next_combination` respectively.
+Upcoming C++17 Concurrent STL algorithms does not include parallel `next_permutation` and `next_combination`. `compute_all_perm` and `compute_all_comb` make use of `next_permutation` and `next_combination` underneath to find all the permutations and combinations. 
+
+**Note**: Function overload with predicate is available.
 
 **Note**: Work is still ongoing. Library is not yet submitted for Boost review and is not part of Boost Library.
 
@@ -34,6 +36,10 @@ g++     CalcComb.cpp -std=c++11 -lpthread -O2
 clang++ CalcPerm.cpp -std=c++11 -lpthread -O2
 clang++ CalcComb.cpp -std=c++11 -lpthread -O2
 ```
+
+### No CMake?
+
+This is header only library.
 
 ### Formulae
 
@@ -70,6 +76,27 @@ void main()
 }
 ```
 
+Example on `compute_all_perm` with predicate
+
+```cpp
+#include "../permcomb/concurrent_perm.h"
+
+void main()
+{
+    std::string results(11, 'A');
+    std::iota(results.begin(), results.end(), 'A');
+    
+    int64_t thread_cnt = 2;
+
+    concurrent_perm::compute_all_perm(thread_cnt, results, 
+		[](const int thread_index, const std::string& cont) 
+			{return true;},
+		[](char a, char b) 
+			{ return a < b; }			
+		);
+}
+```
+
 Example on `compute_all_comb`
 
 ```cpp
@@ -86,6 +113,28 @@ void main()
     concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, 
 		[] (const int thread_index, uint32_t fullset, const std::vector<int>& cont) 
 			{return true;});
+}
+```
+
+Example on `compute_all_comb` with predicate
+
+```cpp
+#include "../permcomb/concurrent_comb.h"
+
+void main()
+{
+    std::vector<int> fullset_vec(20);
+    std::iota(fullset_vec.begin(), fullset_vec.end(), 0);
+    uint32_t subset = 10;
+    
+    int64_t thread_cnt = 2;
+    
+    concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, 
+		[] (const int thread_index, uint32_t fullset, const std::vector<int>& cont) 
+			{return true;}
+		[] (int a, int b) 
+			{ return a == b;}
+		);
 }
 ```
 
