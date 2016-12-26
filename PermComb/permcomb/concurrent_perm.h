@@ -111,7 +111,7 @@ bool find_perm(uint32_t set_size,
 
 template<typename container_type, typename index_type, typename callback_type, typename predicate_type>
 typename std::enable_if<!std::is_same<predicate_type, no_predicate_type>::value>::type 
-perm_loop(const int thread_index, container_type& cont, const index_type& start, const index_type& end, callback_type& callback, predicate_type& pred)
+perm_loop(const int thread_index, container_type& cont, const index_type& start, const index_type& end, callback_type callback, predicate_type pred)
 {
 	for (index_type j = start; j < end; ++j)
 	{
@@ -123,7 +123,7 @@ perm_loop(const int thread_index, container_type& cont, const index_type& start,
 
 template<typename container_type, typename index_type, typename callback_type, typename predicate_type>
 typename std::enable_if<std::is_same<predicate_type, no_predicate_type>::value>::type
-perm_loop(const int thread_index, container_type& cont, const index_type& start, const index_type& end, callback_type& callback, predicate_type& pred)
+perm_loop(const int thread_index, container_type& cont, const index_type& start, const index_type& end, callback_type callback, predicate_type pred)
 {
 	for (index_type j = start; j < end; ++j)
 	{
@@ -138,8 +138,8 @@ void worker_thread_proc(const int_type& thread_index,
 	const container_type& cont,
 	int_type start_index, 
 	int_type end_index, 
-	callback_type& callback,
-	predicate_type& pred)
+	callback_type callback,
+	predicate_type pred)
 {
 	const int thread_index_n = static_cast<const int>(thread_index);
 	std::vector<uint32_t> results;
@@ -175,7 +175,7 @@ void worker_thread_proc(const int_type& thread_index,
 }
 
 template<typename int_type, typename container_type, typename callback_type, typename predicate_type=no_predicate_type>
-bool compute_all_perm(int_type thread_cnt, const container_type& cont, callback_type& callback, predicate_type pred=predicate_type())
+bool compute_all_perm(int_type thread_cnt, const container_type& cont, callback_type callback, predicate_type pred=predicate_type())
 {
 	int_type factorial=0; 
 	compute_factorial(cont.size(), factorial );

@@ -170,7 +170,7 @@ bool find_comb(const uint32_t fullset,
 
 template<typename container_type, typename index_type, typename callback_type, typename predicate_type>
 typename std::enable_if<!std::is_same<predicate_type, no_predicate_type>::value>::type 
-comb_loop(const int thread_index, container_type& cont_full_set, container_type& cont, const index_type& start, const index_type& end, callback_type& callback, predicate_type& pred)
+comb_loop(const int thread_index, container_type& cont_full_set, container_type& cont, const index_type& start, const index_type& end, callback_type callback, predicate_type pred)
 {
 	for (index_type j = start; j < end; ++j)
 	{
@@ -182,7 +182,7 @@ comb_loop(const int thread_index, container_type& cont_full_set, container_type&
 
 template<typename container_type, typename index_type, typename callback_type, typename predicate_type>
 typename std::enable_if<std::is_same<predicate_type, no_predicate_type>::value>::type 
-comb_loop(const int thread_index, container_type& cont_full_set, container_type& cont, const index_type& start, const index_type& end, callback_type& callback, predicate_type& pred)
+comb_loop(const int thread_index, container_type& cont_full_set, container_type& cont, const index_type& start, const index_type& end, callback_type callback, predicate_type pred)
 {
 	for (index_type j = start; j < end; ++j)
 	{
@@ -198,8 +198,8 @@ void worker_thread_proc(const int_type thread_index,
 						int_type start_index, 
 						int_type end_index, 
 						uint32_t subset, 
-						callback_type& callback,
-						predicate_type& pred)
+						callback_type callback,
+						predicate_type pred)
 {
 	const int thread_index_n = static_cast<const int>(thread_index);
 
@@ -236,7 +236,7 @@ void worker_thread_proc(const int_type thread_index,
 }
 
 template<typename int_type, typename container_type, typename callback_type, typename predicate_type = no_predicate_type>
-bool compute_all_comb(int_type thread_cnt, uint32_t subset, const container_type& cont, callback_type& callback, predicate_type pred = predicate_type())
+bool compute_all_comb(int_type thread_cnt, uint32_t subset, const container_type& cont, callback_type callback, predicate_type pred = predicate_type())
 {
 	int_type total_comb=0; 
 	if (!compute_total_comb(cont.size(), subset, total_comb))
