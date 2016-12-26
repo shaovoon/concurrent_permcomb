@@ -72,7 +72,7 @@ void main()
 
     concurrent_perm::compute_all_perm(thread_cnt, results, 
 		[](const int thread_index, const std::string& cont) 
-			{return true;} );
+			{ return true; } );
 }
 ```
 
@@ -90,7 +90,7 @@ void main()
 
     concurrent_perm::compute_all_perm(thread_cnt, results, 
 		[](const int thread_index, const std::string& cont) 
-			{return true;},
+			{ return true; },
 		[](char a, char b) 
 			{ return a < b; }			
 		);
@@ -112,7 +112,7 @@ void main()
     
     concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, 
 		[] (const int thread_index, uint32_t fullset, const std::vector<int>& cont) 
-			{return true;});
+			{ return true; });
 }
 ```
 
@@ -131,7 +131,7 @@ void main()
     
     concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, 
 		[] (const int thread_index, uint32_t fullset, const std::vector<int>& cont) 
-			{return true;}
+			{ return true; }
 		[] (int a, int b) 
 			{ return a == b;}
 		);
