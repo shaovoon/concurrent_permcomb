@@ -133,7 +133,7 @@ void main()
 		[] (const int thread_index, uint32_t fullset, const std::vector<int>& cont) 
 			{ return true; }
 		[] (int a, int b) 
-			{ return a == b;}
+			{ return a == b; }
 		);
 }
 ```
