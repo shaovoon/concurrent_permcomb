@@ -236,14 +236,22 @@ void worker_thread_proc(const int_type thread_index,
 }
 
 template<typename int_type, typename container_type, typename callback_type, typename predicate_type = no_predicate_type>
-bool compute_all_comb(int_type thread_cnt, uint32_t subset, const container_type& cont, callback_type callback, predicate_type pred = predicate_type())
+bool compute_all_comb_shard(int_type cpu_index, int_type cpu_cnt, int_type thread_cnt, uint32_t subset, const container_type& cont, callback_type callback, predicate_type pred = predicate_type())
 {
 	int_type total_comb=0; 
 	if (!compute_total_comb(cont.size(), subset, total_comb))
 		return false;
 
-	int_type each_thread_elem_cnt = total_comb / thread_cnt;
-	int_type remainder = total_comb % thread_cnt;
+	int_type each_cpu_elem_cnt = total_comb / cpu_cnt;
+	int_type cpu_remainder = total_comb % cpu_cnt;
+	int_type offset = cpu_index*each_cpu_elem_cnt;
+	if (cpu_index == (cpu_cnt - 1) && cpu_remainder > 0)
+	{
+		each_cpu_elem_cnt += cpu_remainder;
+	}
+
+	int_type each_thread_elem_cnt = each_cpu_elem_cnt / thread_cnt;
+	int_type remainder = each_cpu_elem_cnt % thread_cnt;
 
 	std::vector<std::shared_ptr<std::thread> > threads;
 
@@ -256,14 +264,15 @@ bool compute_all_comb(int_type thread_cnt, uint32_t subset, const container_type
 		{
 			bulk += remainder;
 		}
-		int_type start_index = i*each_thread_elem_cnt; 
+		int_type start_index = i * each_thread_elem_cnt + offset;
 		int_type end_index = start_index + bulk;
 		threads.push_back( std::shared_ptr<std::thread>(new std::thread(
 			std::bind(worker_thread_proc<int_type, container_type, callback_type, predicate_type>, i, cont, start_index, end_index, subset, callback, pred))));
 	}
 
-	int_type start_index = 0; 
-	int_type end_index = bulk;
+	bulk = each_thread_elem_cnt; // reset remainder
+	int_type start_index = offset;
+	int_type end_index = start_index + bulk;
 	int_type thread_index=0;
 	worker_thread_proc<int_type, container_type, callback_type, predicate_type>( thread_index, cont, start_index, end_index, subset, callback, pred);
 
@@ -273,6 +282,14 @@ bool compute_all_comb(int_type thread_cnt, uint32_t subset, const container_type
 	}
 
 	return true;
+}
+
+template<typename int_type, typename container_type, typename callback_type, typename predicate_type = no_predicate_type>
+bool compute_all_comb(int_type thread_cnt, uint32_t subset, const container_type& cont, callback_type callback, predicate_type pred = predicate_type())
+{
+	int_type cpu_index = 0;
+	int_type cpu_cnt = 1;
+	return compute_all_comb_shard(cpu_index, cpu_cnt, thread_cnt, subset, cont, callback, pred);
 }
 
 }

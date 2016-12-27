@@ -10,6 +10,7 @@ void test_find_perm(uint32_t PermSetSize);
 void unit_test();
 void unit_test_threaded();
 void unit_test_threaded_predicate();
+void unit_test_threaded_shard();
 void benchmark_perm();
 
 template<typename T>
@@ -135,6 +136,66 @@ bool test_threaded_perm(int_type thread_cnt, uint32_t set_size)
 	return true;
 }
 
+template<typename int_type>
+bool test_threaded_perm_shard(int_type thread_cnt, uint32_t set_size)
+{
+	std::cout << "test_threaded_perm_shard(" << thread_cnt << ", " << set_size << ") starting" << std::endl;
+
+	std::vector<char> results(set_size);
+	std::iota(results.begin(), results.end(), 'A');
+
+	std::vector<std::vector< std::vector<char> > > vecvecvec((size_t)thread_cnt);
+
+	int_type cpu_cnt = 4;
+	std::vector<std::vector<std::vector< std::vector<char> > > > vecvecvecvec;
+	for (int_type i = 0; i < cpu_cnt; ++i)
+		vecvecvecvec.push_back(vecvecvec);
+
+	for (int_type i = 0; i < cpu_cnt; ++i)
+	{
+		int_type cpu_index = i;
+		int cpu_index_n = static_cast<int>(cpu_index);
+		concurrent_perm::compute_all_perm_shard(cpu_index, cpu_cnt, thread_cnt, results,
+			[&vecvecvecvec, cpu_index_n](const int thread_index, const std::vector<char>& cont) -> bool
+		{
+			vecvecvecvec[cpu_index_n][thread_index].push_back(cont);
+			return true;
+		});
+	}
+
+	std::vector< std::vector<char> > vecvec;
+	do
+	{
+		vecvec.push_back(std::vector<char>(results.begin(), results.end()));
+	} while (std::next_permutation(results.begin(), results.end()));
+
+	// compare results
+	size_t cnt = 0;
+	bool error = false;
+	for (size_t k = 0; k < vecvecvecvec.size(); ++k)
+	{
+		for (size_t i = 0; i < vecvecvecvec[k].size(); ++i)
+		{
+			for (size_t j = 0; j < vecvecvecvec[k][i].size(); ++j, ++cnt)
+			{
+				if (!compare_vec(vecvec[cnt], vecvecvecvec[k][i][j]))
+				{
+					error = true;
+					std::cerr << "Perm at " << cnt << " is not the same!" << std::endl;
+
+					display(vecvec[cnt]);
+					display(vecvecvecvec[k][i][j]);
+
+					return false;
+				}
+			}
+		}
+	}
+	std::cout << "test_threaded_perm_shard(" << thread_cnt << ", " << set_size << ") finished with" << ((error) ? " errors" : " no errors") << std::endl;
+
+	return true;
+}
+
 // return false to stop processing
 template<typename container_type>
 struct empty_callback_t
@@ -151,13 +212,15 @@ typedef int64_t int_type;
 
 int main(int argc, char* argv[])
 {
-	benchmark_perm();
+	//benchmark_perm();
 
 	//unit_test();
 
 	//unit_test_threaded();
 
 	//unit_test_threaded_predicate();
+
+	unit_test_threaded_shard();
 
 	return 0;
 }
@@ -269,4 +332,13 @@ void unit_test_threaded_predicate()
 	test_threaded_perm_predicate(thread_cnt, 8);
 	test_threaded_perm_predicate(thread_cnt, 9);
 	test_threaded_perm_predicate(thread_cnt, 10);
+}
+
+void unit_test_threaded_shard()
+{
+	int_type thread_cnt = 2;
+	test_threaded_perm_shard(thread_cnt, 4);
+	test_threaded_perm_shard(thread_cnt, 6);
+	test_threaded_perm_shard(thread_cnt, 7);
+	test_threaded_perm_shard(thread_cnt, 8);
 }
