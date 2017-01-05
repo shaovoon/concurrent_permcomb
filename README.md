@@ -72,7 +72,10 @@ void main()
 
     concurrent_perm::compute_all_perm(thread_cnt, results, 
 		[](const int thread_index, const std::string& cont) 
-			{ return true; } );
+			{ return true; } /* evaluation callback */,
+		[](const int thread_index, const std::string& cont, const std::string& error) 
+			{ std::cerr << error; } /* error callback */           
+        );
 }
 ```
 
@@ -90,7 +93,9 @@ void main()
 
     concurrent_perm::compute_all_perm(thread_cnt, results, 
 		[](const int thread_index, const std::string& cont) 
-			{ return true; },
+			{ return true; } /* evaluation callback */,
+		[](const int thread_index, const std::string& cont, const std::string& error) 
+			{ std::cerr << error; } /* error callback */,            
 		[](char a, char b) 
 			{ return a < b; }			
 		);
@@ -112,7 +117,10 @@ void main()
     
     concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, 
 		[] (const int thread_index, uint32_t fullset, const std::vector<int>& cont) 
-			{ return true; });
+			{ return true; } /* evaluation callback */,
+		[] (const int thread_index, uint32_t fullset, const std::vector<int>& cont, const std::string& error) 
+			{ std::cerr << error; } /* error callback */,
+        );
 }
 ```
 
@@ -131,7 +139,9 @@ void main()
     
     concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, 
 		[] (const int thread_index, uint32_t fullset, const std::vector<int>& cont) 
-			{ return true; }
+			{ return true; } /* evaluation callback */,
+		[] (const int thread_index, uint32_t fullset, const std::vector<int>& cont, const std::string& error) 
+			{ std::cerr << error; } /* error callback */,
 		[] (int a, int b) 
 			{ return a == b; }
 		);
@@ -158,12 +168,15 @@ void main()
 	int matched[4] = {0,0,0,0};
 
     concurrent_perm::compute_all_perm(thread_cnt, results, 
-		[&matched](const int thread_index, const std::string& cont) 
+		[&matched](const int thread_index, const std::string& cont) /* evaluation callback */
 			{
 				if(...) 
 					++matched[thread_index];
 				return true;
-			} 
+			},
+		[] (const int thread_index, const std::string& cont, const std::string& error) 
+			{ std::cerr << error; } /* error callback */, 
+            
 		);
 			
 	int total_matched = matched[0] + matched[1] + matched[2] + matched[3];

@@ -54,6 +54,13 @@ bool test_threaded_comb_predicate(int_type thread_cnt, uint32_t fullset_size, ui
 		vecvecvec[(size_t)thread_index].push_back(cont);
 		return true;
 	},
+		[](const int thread_index,
+			const size_t fullset_cnt,
+			const std::vector<uint32_t>& cont, 
+            const std::string& error) -> void
+	{
+		std::cerr << error;
+	},
 		[](uint32_t a, uint32_t b) { return a == b; });
 
 	std::vector<uint32_t> subset(subset_size);
@@ -108,7 +115,14 @@ bool test_threaded_comb(int_type thread_cnt, uint32_t fullset_size, uint32_t sub
 		{
 			vecvecvec[(size_t)thread_index].push_back(cont);
 			return true;
-		});
+		},
+        [](const int thread_index,
+			const size_t fullset_cnt,
+			const std::vector<uint32_t>& cont, 
+            const std::string& error) -> void
+        {
+            std::cerr << error;
+        });
 
 	std::vector<uint32_t> subset(subset_size);
 	std::iota(subset.begin(), subset.end(), 0);
@@ -172,6 +186,13 @@ bool test_threaded_comb_shard(int_type thread_cnt, uint32_t fullset_size, uint32
 		{
 			vecvecvecvec[cpu_index_n][(size_t)thread_index].push_back(cont);
 			return true;
+		},
+			[](const int thread_index,
+				const size_t fullset_cnt,
+				const std::vector<uint32_t>& cont, 
+                const std::string& error) -> void
+		{
+            std::cerr << error;
 		});
 	}
 	std::vector<uint32_t> subset(subset_size);
@@ -221,6 +242,15 @@ struct empty_callback_t
 	}
 };
 
+template<typename container_type>
+struct error_callback_t
+{
+	void operator()(const int thread_index, const size_t fullset_size, const container_type& cont, const std::string& error)
+	{
+		std::cerr << error << std::endl;
+	}
+};
+
 //typedef boost::multiprecision::cpp_int int_type;
 //typedef boost::multiprecision::int128_t int_type;
 typedef int64_t int_type;
@@ -263,25 +293,26 @@ void benchmark_comb()
 	int_type thread_cnt = 1;
 
 	typedef empty_callback_t<decltype(fullset_vec)> callback_t;
+	typedef error_callback_t<decltype(fullset_vec)> err_callback_t;
 
 	stopwatch.start("1 thread(s)");
 	thread_cnt = 1;
-	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, callback_t());
+	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, callback_t(), err_callback_t());
 	stopwatch.stop();
 
 	stopwatch.start("2 thread(s)");
 	thread_cnt = 2;
-	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, callback_t());
+	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, callback_t(), err_callback_t());
 	stopwatch.stop();
 
 	stopwatch.start("3 thread(s)");
 	thread_cnt = 3;
-	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, callback_t());
+	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, callback_t(), err_callback_t());
 	stopwatch.stop();
 
 	stopwatch.start("4 thread(s)");
 	thread_cnt = 4;
-	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, callback_t());
+	concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, callback_t(), err_callback_t());
 	stopwatch.stop();
 }
 

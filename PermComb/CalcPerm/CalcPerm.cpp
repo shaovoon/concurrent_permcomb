@@ -53,6 +53,10 @@ bool test_threaded_perm_predicate(int_type thread_cnt, uint32_t set_size)
 		vecvecvec[thread_index].push_back(cont);
 		return true;
 	},
+		[](const int thread_index, const std::vector<char>& cont, const std::string& error) -> void
+	{
+		std::cerr << error;
+	},
 		[](char a, char b)
 	{
 		return a < b;
@@ -104,6 +108,10 @@ bool test_threaded_perm(int_type thread_cnt, uint32_t set_size)
 	{
 		vecvecvec[thread_index].push_back(cont);
 		return true;
+	},
+    	[] (const int thread_index, const std::vector<char>& cont, const std::string& error) -> void
+	{
+		std::cerr << error;
 	});
 
 	std::vector< std::vector<char> > vecvec;
@@ -160,6 +168,10 @@ bool test_threaded_perm_shard(int_type thread_cnt, uint32_t set_size)
 		{
 			vecvecvecvec[cpu_index_n][thread_index].push_back(cont);
 			return true;
+		},
+        	[](const int thread_index, const std::vector<char>& cont, const std::string& error) -> void
+		{
+            std::cerr << error;
 		});
 	}
 
@@ -206,6 +218,15 @@ struct empty_callback_t
 	}
 };
 
+template<typename container_type>
+struct error_callback_t
+{
+	void operator()(const int thread_index, const container_type& cont, const std::string& error)
+	{
+		std::cerr << error << std::endl;
+	}
+};
+
 //typedef boost::multiprecision::cpp_int int_type;
 //typedef boost::multiprecision::int256_t int_type;
 typedef int64_t int_type;
@@ -245,25 +266,26 @@ void benchmark_perm()
 	int_type thread_cnt = 1;
 
 	typedef empty_callback_t<decltype(results)> callback_t;
+	typedef error_callback_t<decltype(results)> err_callback_t;
 
 	stopwatch.start("1 thread(s)");
 	thread_cnt = 1;
-	concurrent_perm::compute_all_perm(thread_cnt, results, callback_t());
+	concurrent_perm::compute_all_perm(thread_cnt, results, callback_t(), err_callback_t());
 	stopwatch.stop();
 
 	stopwatch.start("2 thread(s)");
 	thread_cnt = 2;
-	concurrent_perm::compute_all_perm(thread_cnt, results, callback_t());
+	concurrent_perm::compute_all_perm(thread_cnt, results, callback_t(), err_callback_t());
 	stopwatch.stop();
 
 	stopwatch.start("3 thread(s)");
 	thread_cnt = 3;
-	concurrent_perm::compute_all_perm(thread_cnt, results, callback_t());
+	concurrent_perm::compute_all_perm(thread_cnt, results, callback_t(), err_callback_t());
 	stopwatch.stop();
 
 	stopwatch.start("4 thread(s)");
 	thread_cnt = 4;
-	concurrent_perm::compute_all_perm(thread_cnt, results, callback_t());
+	concurrent_perm::compute_all_perm(thread_cnt, results, callback_t(), err_callback_t());
 	stopwatch.stop();
 }
 

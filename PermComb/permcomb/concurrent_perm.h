@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <vector>
 #include <cstdint>
+#include <sstream>
 
 namespace concurrent_perm
 {
@@ -109,36 +110,81 @@ bool find_perm(uint32_t set_size,
 	return processed;
 }
 
-template<typename container_type, typename index_type, typename callback_type, typename predicate_type>
+template<typename container_type, typename index_type, typename callback_type, typename error_callback_type, typename predicate_type>
 typename std::enable_if<!std::is_same<predicate_type, no_predicate_type>::value>::type 
-perm_loop(const int thread_index, container_type& cont, const index_type& start, const index_type& end, callback_type callback, predicate_type pred)
+perm_loop(const int thread_index, container_type& cont, const index_type& start, const index_type& end, callback_type callback, error_callback_type err_callback, predicate_type pred)
 {
-	for (index_type j = start; j < end; ++j)
-	{
-		if (!callback(thread_index, cont))
-			return;
-		std::next_permutation(cont.begin(), cont.end(), pred);
-	}
+    index_type j = start;
+    try
+    {
+        for (; j < end; ++j)
+        {
+            if (!callback(thread_index, cont))
+                return;
+            std::next_permutation(cont.begin(), cont.end(), pred);
+        }
+    }
+    catch(std::exception& ex)
+    {
+        std::ostringstream oss;
+        oss << "Exception thrown thrown in perm_loop:" << ex.what();
+        oss << ", start index:" << start;
+        oss << ", end index:" << end;
+        oss << ", counting index:" << j;
+        err_callback(thread_index, cont, oss.str());
+    }
+    catch(...)
+    {
+        std::ostringstream oss;
+        oss << "Unknown exception thrown in perm_loop:";
+        oss << ", start index:" << start;
+        oss << ", end index:" << end;
+        oss << ", counting index:" << j;
+        err_callback(thread_index, cont, oss.str());
+    }
 }
 
-template<typename container_type, typename index_type, typename callback_type, typename predicate_type>
+template<typename container_type, typename index_type, typename callback_type, typename error_callback_type, typename predicate_type>
 typename std::enable_if<std::is_same<predicate_type, no_predicate_type>::value>::type
-perm_loop(const int thread_index, container_type& cont, const index_type& start, const index_type& end, callback_type callback, predicate_type pred)
+perm_loop(const int thread_index, container_type& cont, const index_type& start, const index_type& end, callback_type callback, error_callback_type err_callback, predicate_type pred)
 {
-	for (index_type j = start; j < end; ++j)
-	{
-		if (!callback(thread_index, cont))
-			return;
-		std::next_permutation(cont.begin(), cont.end());
-	}
+    index_type j = start;
+    try
+    {
+        for (; j < end; ++j)
+        {
+            if (!callback(thread_index, cont))
+                return;
+            std::next_permutation(cont.begin(), cont.end());
+        }
+    }
+    catch(std::exception& ex)
+    {
+        std::ostringstream oss;
+        oss << "Exception thrown thrown in perm_loop:" << ex.what();
+        oss << ", start index:" << start;
+        oss << ", end index:" << end;
+        oss << ", counting index:" << j;
+        err_callback(thread_index, cont, oss.str());
+    }
+    catch(...)
+    {
+        std::ostringstream oss;
+        oss << "Unknown exception thrown thrown in perm_loop:";
+        oss << ", start index:" << start;
+        oss << ", end index:" << end;
+        oss << ", counting index:" << j;
+        err_callback(thread_index, cont, oss.str());
+    }
 }
 
-template<typename int_type, typename container_type, typename callback_type, typename predicate_type>
+template<typename int_type, typename container_type, typename callback_type, typename error_callback_type, typename predicate_type>
 void worker_thread_proc(const int_type& thread_index, 
 	const container_type& cont,
 	int_type start_index, 
 	int_type end_index, 
 	callback_type callback,
+    error_callback_type err_callback,
 	predicate_type pred)
 {
 	const int thread_index_n = static_cast<const int>(thread_index);
@@ -160,22 +206,22 @@ void worker_thread_proc(const int_type& thread_index,
 	{
 		const int start_i = static_cast<int>(start_index);
 		const int end_i   = static_cast<int>(end_index);
-		perm_loop(thread_index_n, vec, start_i, end_i, callback, pred);
+		perm_loop(thread_index_n, vec, start_i, end_i, callback, err_callback, pred);
 	}
 	else if (end_index <= std::numeric_limits<int64_t>::max()) // use POD counter when possible
 	{
 		const int64_t start_i = static_cast<int64_t>(start_index);
 		const int64_t end_i = static_cast<int64_t>(end_index);
-		perm_loop(thread_index_n, vec, start_i, end_i, callback, pred);
+		perm_loop(thread_index_n, vec, start_i, end_i, callback, err_callback, pred);
 	}
 	else
 	{
-		perm_loop(thread_index_n, vec, start_index, end_index, callback, pred);
+		perm_loop(thread_index_n, vec, start_index, end_index, callback, err_callback, pred);
 	}
 }
 
-template<typename int_type, typename container_type, typename callback_type, typename predicate_type=no_predicate_type>
-bool compute_all_perm_shard(int_type cpu_index, int_type cpu_cnt, int_type thread_cnt, const container_type& cont, callback_type callback, predicate_type pred=predicate_type())
+template<typename int_type, typename container_type, typename callback_type, typename error_callback_type, typename predicate_type=no_predicate_type>
+bool compute_all_perm_shard(int_type cpu_index, int_type cpu_cnt, int_type thread_cnt, const container_type& cont, callback_type callback, error_callback_type err_callback, predicate_type pred=predicate_type())
 {
 	int_type factorial=0; 
 	compute_factorial(cont.size(), factorial );
@@ -205,14 +251,14 @@ bool compute_all_perm_shard(int_type cpu_index, int_type cpu_cnt, int_type threa
 		int_type start_index = i * each_thread_elem_cnt + offset;
 		int_type end_index = start_index + bulk;
 		threads.push_back( std::shared_ptr<std::thread>(new std::thread(
-			std::bind(worker_thread_proc<int_type, container_type, callback_type, predicate_type>, i, cont, start_index, end_index, callback, pred))));
+			std::bind(worker_thread_proc<int_type, container_type, callback_type, error_callback_type, predicate_type>, i, cont, start_index, end_index, callback, err_callback, pred))));
 	}
 
 	bulk = each_thread_elem_cnt; // reset remainder
 	int_type start_index = offset;
 	int_type end_index = start_index + bulk;
 	int_type thread_index = 0;
-	worker_thread_proc<int_type, container_type, callback_type, predicate_type>(thread_index, cont, start_index, end_index, callback, pred);
+	worker_thread_proc<int_type, container_type, callback_type, error_callback_type, predicate_type>(thread_index, cont, start_index, end_index, callback, err_callback, pred);
 
 	for(size_t i=0; i<threads.size(); ++i)
 	{
@@ -222,12 +268,12 @@ bool compute_all_perm_shard(int_type cpu_index, int_type cpu_cnt, int_type threa
 	return true;
 }
 
-template<typename int_type, typename container_type, typename callback_type, typename predicate_type = no_predicate_type>
-bool compute_all_perm(int_type thread_cnt, const container_type& cont, callback_type callback, predicate_type pred = predicate_type())
+template<typename int_type, typename container_type, typename callback_type, typename error_callback_type, typename predicate_type = no_predicate_type>
+bool compute_all_perm(int_type thread_cnt, const container_type& cont, callback_type callback, error_callback_type err_callback, predicate_type pred = predicate_type())
 {
 	int_type cpu_index = 0; 
 	int_type cpu_cnt = 1;
-	return compute_all_perm_shard(cpu_index, cpu_cnt, thread_cnt, cont, callback, pred);
+	return compute_all_perm_shard(cpu_index, cpu_cnt, thread_cnt, cont, callback, err_callback, pred);
 }
 
 }
