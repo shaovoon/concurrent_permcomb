@@ -194,6 +194,36 @@ Cancellation is not directly supported but every callback can return `false` to 
 
 **Answer**: `thread_cnt` - 1. For `thread_cnt` = 4, 3 threads will be spawned while main thread is used to compute the 4th batch. For `thread_cnt` = 1, no threads is spawned, all work is done in the main thread.
 
+### How to split the work across physically separate processors?
+
+Say you have more than 1 computer at home or can access cloud of computers, Work can be split using `compute_all_perm_shard`. In fact `compute_all_perm` calls `compute_all_perm_shard` to do the work as well. `compute_all_perm_shard` has 2 extra parameters which are `cpu_index` and `cpu_cnt`. `cpu_index` can be [0..`cpu_cnt`).
+
+```cpp
+#include "../permcomb/concurrent_perm.h"
+
+void main()
+{
+    std::string results(11, 'A');
+    std::iota(results.begin(), results.end(), 'A');
+    
+    int64_t thread_cnt = 4;
+	
+	int_type cpu_cnt = 2;
+	int_type cpu_index = 0; /* 0 or 1 */
+	int cpu_index_n = static_cast<int>(cpu_index);
+
+    concurrent_perm::compute_all_perm_shard(cpu_index, cpu_cnt, thread_cnt, results, 
+		[](const int thread_index, const std::string& cont) /* evaluation callback */
+			{
+				return true;
+			},
+		[] (const int thread_index, const std::string& cont, const std::string& error) 
+			{ std::cerr << error; } /* error callback */, 
+            
+		);
+}
+```
+
 ### Benchmark results
 
 Intel i7 6700 CPU with 16 GB RAM with Visual C++ on Windows 10
