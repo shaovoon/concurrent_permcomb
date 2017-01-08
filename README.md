@@ -97,7 +97,7 @@ void main()
 		[](const int thread_index, const std::string& cont, const std::string& error) 
 			{ std::cerr << error; } /* error callback */,            
 		[](char a, char b) 
-			{ return a < b; }			
+			{ return a < b; } /* predicate */
 		);
 }
 ```
@@ -143,7 +143,7 @@ void main()
 		[] (const int thread_index, uint32_t fullset, const std::vector<int>& cont, const std::string& error) 
 			{ std::cerr << error; } /* error callback */,
 		[] (int a, int b) 
-			{ return a == b; }
+			{ return a == b; } /* predicate */
 		);
 }
 ```
