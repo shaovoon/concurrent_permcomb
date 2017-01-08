@@ -196,7 +196,7 @@ Cancellation is not directly supported but every callback can return `false` to 
 
 ### How to split the work across physically separate processors?
 
-Say you have more than 1 computer at home or can access cloud of computers, Work can be split using `compute_all_perm_shard`. In fact `compute_all_perm` calls `compute_all_perm_shard` to do the work as well. `compute_all_perm_shard` has 2 extra parameters which are `cpu_index` and `cpu_cnt`. `cpu_index` can be [0..`cpu_cnt`).
+Say you have more than 1 computer at home or can access cloud of computers, Work can be split using `compute_all_perm_shard`. In fact `compute_all_perm` calls `compute_all_perm_shard` to do the work as well. `compute_all_perm_shard` has 2 extra parameters which are `cpu_index` and `cpu_cnt`. Value of `cpu_index` can be [0..`cpu_cnt`).
 
 ```cpp
 #include "../permcomb/concurrent_perm.h"
