@@ -2,7 +2,7 @@
 
 ### Primary motivation
 
-Upcoming C++17 Concurrent STL algorithms does not include parallel `next_permutation` and `next_combination`. `compute_all_perm` and `compute_all_comb` make use of `next_permutation` and `next_combination` underneath to find all the permutations and combinations. Many years ago, I had written parallel library which only deals with integer type but this one can permutes and combines any data types.
+Upcoming C++17 Concurrent STL algorithms does not include parallel `next_permutation` and `next_combination`. `compute_all_perm` and `compute_all_comb` make use of `next_permutation` and `next_combination` underneath to find all the permutations and combinations. Many years ago, I had written parallel library which only deals with integer type but it exposes many internal workings. This one encapsulates the details and can permute/combine with any data types.
 
 **Note**: Function overload with predicate is available.
 
