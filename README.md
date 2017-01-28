@@ -37,9 +37,9 @@ clang++ CalcPerm.cpp -std=c++11 -lpthread -O2
 clang++ CalcComb.cpp -std=c++11 -lpthread -O2
 ```
 
-### No CMake?
+### No CMakeList?
 
-This is header only library.
+This is header-only library.
 
 ### Formulae
 
@@ -54,9 +54,49 @@ Use `compute_total_comb` to calculate total combination count.
 
 ### Limitation
 
-`next_permutation` supports duplicate elements but `compute_all_perm` and `compute_all_comb` do not. Make sure every element is unique.
+`next_permutation` supports duplicate elements but `compute_all_perm` and `compute_all_comb` do not. Make sure every element is unique. Also make sure total results are greater than number of threads spawned.
 
 ### Examples
+
+`compute_all_perm` function and callback signatures
+
+```cpp
+// compute_all_perm function signature
+template<typename int_type, typename container_type, typename callback_type, 
+	typename error_callback_type, typename predicate_type = no_predicate_type>
+bool compute_all_perm(int_type thread_cnt, const container_type& cont, callback_type callback, 
+	error_callback_type err_callback, predicate_type pred = predicate_type());
+
+// callback_type signature
+template<typename container_type>
+struct callback_t
+{
+	bool operator()(const int thread_index, const container_type& cont)
+	{
+		return true; // can return false to cancel processing in current thread
+	}
+};
+
+// error_callback_type example
+template<typename container_type>
+struct error_callback_t
+{
+	void operator()(const int thread_index, const container_type& cont, const std::string& error)
+	{
+		std::cerr << error << std::endl;
+	}
+};
+
+// predicate_type example
+template<typename T>
+struct predicate_t
+{
+	bool operator()(T a, T b)
+	{
+		return a < b;
+	}
+};
+```
 
 Example on `compute_all_perm`
 
@@ -100,6 +140,48 @@ void main()
 			{ return a < b; } /* predicate */
 		);
 }
+```
+
+`compute_all_comb` function and callback signatures
+
+```cpp
+// compute_all_perm function signature
+template<typename int_type, typename container_type, typename callback_type, 
+	typename error_callback_type, typename predicate_type = no_predicate_type>
+bool compute_all_comb(int_type thread_cnt, uint32_t subset, const container_type& cont, 
+	callback_type callback, error_callback_type err_callback, predicate_type pred = predicate_type())
+
+// callback_type signature
+template<typename container_type>
+struct callback_t
+{
+	bool operator()(const int thread_index, const size_t fullset_size, const container_type& cont)
+	{
+		return true; // can return false to cancel processing in current thread
+	}
+};
+
+// error_callback_type example
+template<typename container_type>
+struct error_callback_t
+{
+	void operator()(const int thread_index, const size_t fullset_size, 
+		const container_type& cont, const std::string& error)
+	{
+		std::cerr << error << std::endl;
+	}
+};
+
+
+// predicate_type example
+template<typename T>
+struct predicate_t
+{
+	bool operator()(T a, T b)
+	{
+		return a == b;
+	}
+};
 ```
 
 Example on `compute_all_comb`
@@ -218,6 +300,32 @@ void main()
 				return true;
 			},
 		[] (const int thread_index, const std::string& cont, const std::string& error) 
+			{ std::cerr << error; } /* error callback */, 
+            
+		);
+}
+```
+
+```cpp
+#include "../permcomb/concurrent_comb.h"
+
+void main()
+{
+	std::vector<uint32_t> fullset(fullset_size);
+	std::iota(fullset.begin(), fullset.end(), 0);
+    
+    int64_t thread_cnt = 4;
+	
+	int_type cpu_cnt = 2;
+	int_type cpu_index = 0; /* 0 or 1 */
+	int cpu_index_n = static_cast<int>(cpu_index);
+
+    concurrent_comb::compute_all_comb_shard(cpu_index, cpu_cnt, thread_cnt, subset_size, fullset, 
+		[](const int thread_index, const size_t fullset_cnt, const std::vector<uint32_t>& cont) 
+			{ /* evaluation callback */
+				return true;
+			},
+		[] (const int thread_index, const std::vector<uint32_t>& cont, const std::string& error) 
 			{ std::cerr << error; } /* error callback */, 
             
 		);
