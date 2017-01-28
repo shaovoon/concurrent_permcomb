@@ -41,7 +41,9 @@ clang++ CalcComb.cpp -std=c++11 -lpthread -O2
 
 This is header-only library.
 
-### Formulae
+### Formulae to calculate total results returned.
+
+Calculate this in a calculator and use sum to determine the largest integer type to be used.
 
 ```cpp
 Total Permutation: n!
@@ -58,7 +60,7 @@ Use `compute_total_comb` to calculate total combination count.
 
 ### Examples
 
-`compute_all_perm` function and callback signatures
+`compute_all_perm` function and callback signatures. Callback should catch all exceptions and return false. If exception propagate outside callback, error_callback will be invoked and processing will be stopped prematurely for the thread.
 
 ```cpp
 // compute_all_perm function signature
@@ -142,7 +144,7 @@ void main()
 }
 ```
 
-`compute_all_comb` function and callback signatures
+`compute_all_comb` function and callback signatures. Callback should catch all exceptions and return false. If exception propagate outside callback, error_callback will be invoked and processing will be stopped prematurely for the thread.
 
 ```cpp
 // compute_all_perm function signature
