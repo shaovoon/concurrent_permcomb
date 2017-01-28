@@ -60,7 +60,7 @@ Use `compute_total_comb` to calculate total combination count.
 
 ### Examples
 
-`compute_all_perm` function and callback signatures. Callback should catch all exceptions and return false. If exception propagate outside callback, error_callback will be invoked and processing will be stopped prematurely for the thread.
+`compute_all_perm` function and callback signatures shown below. Callback should catch all exceptions and return false. If exception propagate outside callback, error_callback will be invoked and processing will be stopped prematurely for the thread.
 
 ```cpp
 // compute_all_perm function signature
@@ -100,7 +100,7 @@ struct predicate_t
 };
 ```
 
-Example on `compute_all_perm`
+Example on how to use `compute_all_perm`
 
 ```cpp
 #include "../permcomb/concurrent_perm.h"
@@ -121,7 +121,7 @@ void main()
 }
 ```
 
-Example on `compute_all_perm` with predicate
+Example on how to use `compute_all_perm` with predicate
 
 ```cpp
 #include "../permcomb/concurrent_perm.h"
@@ -144,10 +144,10 @@ void main()
 }
 ```
 
-`compute_all_comb` function and callback signatures. Callback should catch all exceptions and return false. If exception propagate outside callback, error_callback will be invoked and processing will be stopped prematurely for the thread.
+`compute_all_comb` function and callback signatures shown below. Callback should catch all exceptions and return false. If exception propagate outside callback, error_callback will be invoked and processing will be stopped prematurely for the thread.
 
 ```cpp
-// compute_all_perm function signature
+// compute_all_comb function signature
 template<typename int_type, typename container_type, typename callback_type, 
 	typename error_callback_type, typename predicate_type = no_predicate_type>
 bool compute_all_comb(int_type thread_cnt, uint32_t subset, const container_type& cont, 
@@ -186,7 +186,7 @@ struct predicate_t
 };
 ```
 
-Example on `compute_all_comb`
+Example on how to use `compute_all_comb`
 
 ```cpp
 #include "../permcomb/concurrent_comb.h"
@@ -208,7 +208,7 @@ void main()
 }
 ```
 
-Example on `compute_all_comb` with predicate
+Example on how to use `compute_all_comb` with predicate
 
 ```cpp
 #include "../permcomb/concurrent_comb.h"
@@ -236,7 +236,7 @@ void main()
 
 Library need to know the container type to instantiate a copy in the worker thread. From the iterator type, we have no way to know the container. Iterator type is not compatible: for example `string` and `vector` iterator are not interchangeable; It is not right that user pass `string` iterator but library pass `vector` iterator to callback.
 
-### How to use thread_index parameter in callback?
+### How to make use of thread_index parameter in callback?
 
 `thread_index` is a zero based and consecutive number. For example when `thread_cnt` is 4, then `thread_index` would be [0..3]. Data type of `thread_cnt` has to be a type large enough to hold the largest factorial required.
 
