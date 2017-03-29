@@ -226,12 +226,36 @@ void worker_thread_proc(const int_type& thread_index,
 template<typename int_type, typename container_type, typename callback_type, typename error_callback_type, typename predicate_type=no_predicate_type>
 bool compute_all_perm_shard(int_type cpu_index, int_type cpu_cnt, int_type thread_cnt, const container_type& cont, callback_type callback, error_callback_type err_callback, predicate_type pred=predicate_type())
 {
+	if (cpu_cnt <= 0)
+	{
+		std::ostringstream oss;
+		oss << "Error: cpu_cnt(" << cpu_cnt;
+		oss << ") <= 0";
+
+		err_callback(int_type(0), cont, oss.str());
+		return false;
+	}
+
+	if (thread_cnt <= 0)
+	{
+		std::ostringstream oss;
+		oss << "Error: thread_cnt(" << thread_cnt;
+		oss << ") <= 0";
+
+		err_callback(int_type(0), cont, oss.str());
+		return false;
+	}
+
 	int_type factorial=0; 
 	compute_factorial(cont.size(), factorial );
 
 	if (factorial < cpu_cnt)
 	{
-		err_callback(int_type(0), cont, "Error: factorial < cpu_cnt");
+		std::ostringstream oss;
+		oss << "Error: factorial(" << factorial;
+		oss << ") < cpu_cnt(" << cpu_cnt << ")";
+
+		err_callback(int_type(0), cont, oss.str());
 		return false;
 	}
 
@@ -245,7 +269,11 @@ bool compute_all_perm_shard(int_type cpu_index, int_type cpu_cnt, int_type threa
 
 	if (each_cpu_elem_cnt <= 0)
 	{
-		err_callback(int_type(0), cont, "Error: each_cpu_elem_cnt <= 0");
+		std::ostringstream oss;
+		oss << "Error: each_cpu_elem_cnt(" << each_cpu_elem_cnt;
+		oss << ") <= 0";
+
+		err_callback(int_type(0), cont, oss.str());
 		return false;
 	}
 
