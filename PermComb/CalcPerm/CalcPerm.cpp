@@ -237,11 +237,11 @@ int main(int argc, char* argv[])
 
 	//unit_test();
 
-	//unit_test_threaded();
+	unit_test_threaded();
 
 	//unit_test_threaded_predicate();
 
-	unit_test_threaded_shard();
+	//unit_test_threaded_shard();
 
 	return 0;
 }
@@ -343,6 +343,8 @@ void unit_test_threaded()
 	test_threaded_perm(thread_cnt, 8);
 	test_threaded_perm(thread_cnt, 9);
 	test_threaded_perm(thread_cnt, 10);
+	thread_cnt = 8;
+	test_threaded_perm(thread_cnt, 2);
 }
 
 void unit_test_threaded_predicate()
@@ -363,4 +365,6 @@ void unit_test_threaded_shard()
 	test_threaded_perm_shard(thread_cnt, 6);
 	test_threaded_perm_shard(thread_cnt, 7);
 	test_threaded_perm_shard(thread_cnt, 8);
+	//thread_cnt = 8;
+	//test_threaded_perm_shard(thread_cnt, 2); // should fail
 }

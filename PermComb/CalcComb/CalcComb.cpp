@@ -169,7 +169,7 @@ bool test_threaded_comb_shard(int_type thread_cnt, uint32_t fullset_size, uint32
 
 	std::vector<std::vector< std::vector<uint32_t> > > vecvecvec((size_t)thread_cnt);
 
-	int_type cpu_cnt = 2;
+	int_type cpu_cnt = 4;
 	std::vector<std::vector<std::vector< std::vector<uint32_t> > > > vecvecvecvec;
 	for (int_type i = 0; i < cpu_cnt; ++i)
 		vecvecvecvec.push_back(vecvecvec);
@@ -261,11 +261,11 @@ int main(int argc, char* argv[])
 
 	//unit_test();
 
-	//unit_test_threaded();
+	unit_test_threaded();
 
 	//unit_test_threaded_predicate();
 
-	unit_test_threaded_shard();
+	//unit_test_threaded_shard();
 
 	return 0;
 }
@@ -385,6 +385,8 @@ void unit_test_threaded()
 	test_threaded_comb(thread_cnt, 8, 4);
 	test_threaded_comb(thread_cnt, 9, 5);
 	test_threaded_comb(thread_cnt, 10, 5);
+	thread_cnt = 10;
+	test_threaded_comb(thread_cnt, 2, 1);
 }
 
 void unit_test_threaded_predicate()
@@ -407,5 +409,7 @@ void unit_test_threaded_shard()
 	test_threaded_comb_shard(thread_cnt, 8, 4);
 	test_threaded_comb_shard(thread_cnt, 9, 5);
 	test_threaded_comb_shard(thread_cnt, 10, 5);
+	//thread_cnt = 10;
+	//test_threaded_comb_shard(thread_cnt, 2, 1); // should fail
 }
 

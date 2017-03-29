@@ -1,13 +1,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 // concurrent_comb.h header file
 //
-// Concurrent Combination version 0.1.0
+// Concurrent Combination
 // Copyright 2016 Wong Shao Voon
 // Distributed under the Boost Software License, Version 1.0. (See
 // accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 // See http://www.boost.org/libs/foreach for documentation
-
+//
+// version 0.1.0: Initial Release
+// version 0.1.1: More error handling when result count < cpu count
 
 #pragma once
 
@@ -286,7 +288,16 @@ bool compute_all_comb_shard(int_type cpu_index, int_type cpu_cnt, int_type threa
 {
 	int_type total_comb=0; 
 	if (!compute_total_comb(cont.size(), subset, total_comb))
+	{
+		err_callback(int_type(0), cont.size(), cont, "Error: compute_total_comb() return false");
 		return false;
+	}
+
+	if (total_comb < cpu_cnt)
+	{
+		err_callback(int_type(0), cont.size(), cont, "Error: total_comb < cpu_cnt");
+		return false;
+	}
 
 	int_type each_cpu_elem_cnt = total_comb / cpu_cnt;
 	int_type cpu_remainder = total_comb % cpu_cnt;
@@ -294,6 +305,17 @@ bool compute_all_comb_shard(int_type cpu_index, int_type cpu_cnt, int_type threa
 	if (cpu_index == (cpu_cnt - 1) && cpu_remainder > 0)
 	{
 		each_cpu_elem_cnt += cpu_remainder;
+	}
+
+	if (each_cpu_elem_cnt <= 0)
+	{
+		err_callback(int_type(0), cont.size(), cont, "Error: each_cpu_elem_cnt <= 0");
+		return false;
+	}
+
+	if (each_cpu_elem_cnt < thread_cnt)
+	{
+		thread_cnt = 1;
 	}
 
 	int_type each_thread_elem_cnt = each_cpu_elem_cnt / thread_cnt;
