@@ -11,10 +11,12 @@ void unit_test();
 void unit_test_threaded();
 void unit_test_threaded_predicate();
 void unit_test_threaded_shard();
+void unit_test_perm_by_idx();
+void usage_of_perm_by_idx();
 void benchmark_perm();
 
 template<typename T>
-bool compare_vec(std::vector<T>& results1, std::vector<T>& results2)
+bool compare_vec(T& results1, T& results2)
 {
 	if (results1.size() != results2.size())
 		return false;
@@ -28,7 +30,7 @@ bool compare_vec(std::vector<T>& results1, std::vector<T>& results2)
 }
 
 template<typename T>
-void display(std::vector<T>& results)
+void display(T& results)
 {
 	for (size_t i = 0; i<results.size(); ++i)
 	{
@@ -237,11 +239,15 @@ int main(int argc, char* argv[])
 
 	//unit_test();
 
-	unit_test_threaded();
+	//unit_test_threaded();
 
 	//unit_test_threaded_predicate();
 
 	//unit_test_threaded_shard();
+
+	//unit_test_perm_by_idx();
+
+	usage_of_perm_by_idx();
 
 	return 0;
 }
@@ -367,4 +373,65 @@ void unit_test_threaded_shard()
 	test_threaded_perm_shard(thread_cnt, 8);
 	//thread_cnt = 8;
 	//test_threaded_perm_shard(thread_cnt, 2); // should fail
+}
+
+void unit_test_perm_by_idx()
+{
+	uint64_t index_to_find = 0;
+	std::string original_text = "12345";
+	std::string std_permuted = "12345";
+	while (true)
+	{
+		std::string permuted = concurrent_perm::find_perm_by_idx(index_to_find, original_text);
+		if (permuted.size() == 0)
+		{
+			std::cout << "Ended at index: " << index_to_find << std::endl;
+			break;
+		}
+		if (compare_vec(permuted, std_permuted) == false)
+		{
+			std::cout << "string not equal at index: " << index_to_find << std::endl;
+			break;
+		}
+		++index_to_find;
+		std::next_permutation(std_permuted.begin(), std_permuted.end());
+	}
+
+}
+
+void usage_of_perm_by_idx()
+{
+	uint64_t index_to_find = 0;
+	std::string original_text = "12345";
+	std::string std_permuted = "12345";
+	std::vector<std::string> all_results;
+	size_t repeat_times = 30;
+	for (size_t i=0; i<4; ++i)
+	{
+		std::string permuted = concurrent_perm::find_perm_by_idx(index_to_find, original_text);
+
+		all_results.push_back(permuted);
+		std::thread th([&permuted, &all_results, repeat_times] {
+
+			for (size_t j=1; j<repeat_times; ++j)
+			{
+				std::next_permutation(permuted.begin(), permuted.end());
+				all_results.push_back(permuted);
+			}
+		});
+		th.join();
+
+		index_to_find += repeat_times;
+	}
+	std_permuted = "12345";
+	for (size_t i = 0; i < all_results.size(); ++i)
+	{
+		if (compare_vec(all_results[i], std_permuted) == false)
+		{
+			std::cout << "string not equal at index: " << i << std::endl;
+			break;
+		}
+		std::next_permutation(std_permuted.begin(), std_permuted.end());
+	}
+
 }

@@ -91,6 +91,35 @@ bool compute_total_comb( const uint32_t fullset, const uint32_t subset, int_type
 	return true;
 }
 
+template<typename int_type, typename vector_type>
+vector_type find_comb_by_idx(const uint32_t subset,
+	int_type index_to_find,
+	vector_type& original_vector)
+{
+	int_type total = 0;
+	if (compute_total_comb(original_vector.size(), subset, total))
+	{
+		if (index_to_find >= total)
+			return {};
+	}
+
+	std::vector<uint32_t> integer_results(subset);
+	std::iota(integer_results.begin(), integer_results.end(), 0);
+
+	vector_type results;
+	if (find_comb(original_vector.size(),
+		subset,
+		index_to_find,
+		integer_results))
+	{
+		for (uint32_t n : integer_results)
+		{
+			results.push_back(original_vector.at(n));
+		}
+	}
+	return results;
+}
+
 template<typename int_type>
 bool find_comb(const uint32_t fullset, 
 			   const uint32_t subset, 

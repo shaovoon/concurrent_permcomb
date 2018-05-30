@@ -65,6 +65,24 @@ bool remove_element( uint32_t elem, uint32_t& remove_value, std::list<uint32_t>&
 	return false;
 }
 
+template<typename int_type, typename vector_type>
+vector_type find_perm_by_idx(int_type index_to_find,
+	vector_type& original_vector)
+{
+	std::vector<uint32_t> integer_results;
+	vector_type results;
+	if (find_perm(original_vector.size(),
+		index_to_find,
+		integer_results))
+	{
+		for (uint32_t n : integer_results)
+		{
+			results.push_back(original_vector.at(n));
+		}
+	}
+	return results;
+}
+
 template<typename int_type>
 bool find_perm(uint32_t set_size, 
 			  int_type index_to_find, 

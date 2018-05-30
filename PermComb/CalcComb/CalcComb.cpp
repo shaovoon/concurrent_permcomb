@@ -10,10 +10,12 @@ void unit_test();
 void unit_test_threaded();
 void unit_test_threaded_predicate();
 void unit_test_threaded_shard();
+void unit_test_comb_by_idx();
+void usage_of_comb_by_idx();
 void benchmark_comb();
 
 template<typename T>
-bool compare_vec(std::vector<T>& results1, std::vector<T>& results2)
+bool compare_vec(T& results1, T& results2)
 {
 	if (results1.size() != results2.size())
 		return false;
@@ -27,7 +29,7 @@ bool compare_vec(std::vector<T>& results1, std::vector<T>& results2)
 }
 
 template<typename T>
-void display(std::vector<T>& results)
+void display(T& results)
 {
 	for (size_t i = 0; i<results.size(); ++i)
 	{
@@ -261,11 +263,15 @@ int main(int argc, char* argv[])
 
 	//unit_test();
 
-	unit_test_threaded();
+	//unit_test_threaded();
 
 	//unit_test_threaded_predicate();
 
 	//unit_test_threaded_shard();
+
+	//unit_test_comb_by_idx();
+
+	usage_of_comb_by_idx();
 
 	return 0;
 }
@@ -413,3 +419,63 @@ void unit_test_threaded_shard()
 	//test_threaded_comb_shard(thread_cnt, 2, 1); // should fail
 }
 
+void unit_test_comb_by_idx()
+{
+	uint64_t index_to_find = 0;
+	std::string original_text = "123456";
+	std::string std_combined = "123";
+	while (true)
+	{
+		std::string combined = concurrent_comb::find_comb_by_idx(std_combined.size(), index_to_find, original_text);
+		if (combined.size() == 0)
+		{
+			std::cout << "Ended at index: " << index_to_find << std::endl;
+			break;
+		}
+		if (compare_vec(combined, std_combined) == false)
+		{
+			std::cout << "string not equal at index: " << index_to_find << std::endl;
+			break;
+		}
+		++index_to_find;
+		boost::next_combination(original_text.begin(), original_text.end(), std_combined.begin(), std_combined.end());
+	}
+
+}
+
+void usage_of_comb_by_idx()
+{
+	uint64_t index_to_find = 0;
+	std::string original_text = "123456";
+	std::string std_combined = "123";
+	std::vector<std::string> all_results;
+	size_t repeat_times = 5;
+	for (size_t i = 0; i < 4; ++i)
+	{
+		std::string combined = concurrent_comb::find_comb_by_idx(std_combined.size(), index_to_find, original_text);
+
+		all_results.push_back(combined);
+		std::thread th([&original_text, &combined, &all_results, repeat_times] {
+
+			for (size_t j = 1; j < repeat_times; ++j)
+			{
+				boost::next_combination(original_text.begin(), original_text.end(), combined.begin(), combined.end());
+				all_results.push_back(combined);
+			}
+		});
+		th.join();
+
+		index_to_find += repeat_times;
+	}
+	std_combined = "123";
+	for (size_t i = 0; i < all_results.size(); ++i)
+	{
+		if (compare_vec(all_results[i], std_combined) == false)
+		{
+			std::cout << "string not equal at index: " << i << std::endl;
+			break;
+		}
+		boost::next_combination(original_text.begin(), original_text.end(), std_combined.begin(), std_combined.end());
+	}
+
+}
