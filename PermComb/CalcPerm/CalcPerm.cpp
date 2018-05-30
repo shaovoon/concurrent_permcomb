@@ -13,6 +13,7 @@ void unit_test_threaded_predicate();
 void unit_test_threaded_shard();
 void unit_test_perm_by_idx();
 void usage_of_perm_by_idx();
+void usage_of_next_perm();
 void benchmark_perm();
 
 template<typename T>
@@ -249,6 +250,8 @@ int main(int argc, char* argv[])
 
 	usage_of_perm_by_idx();
 
+	//usage_of_next_perm();
+
 	return 0;
 }
 
@@ -399,6 +402,30 @@ void unit_test_perm_by_idx()
 
 }
 
+void usage_of_next_perm()
+{
+	std::string std_permuted = "12345";
+	do
+	{
+		std::cout << std_permuted << std::endl;
+	} while (std::next_permutation(std_permuted.begin(), std_permuted.end()));
+	/* output
+	12345
+	12354
+	12435
+	12453
+	12534
+	12543
+	...
+	54123
+	54132
+	54213
+	54231
+	54312
+	54321
+	*/
+}
+
 void usage_of_perm_by_idx()
 {
 	uint64_t index_to_find = 0;
@@ -430,6 +457,7 @@ void usage_of_perm_by_idx()
 	std_permuted = "12345";
 	for (size_t i = 0; i < all_results.size(); ++i)
 	{
+		std::cout << all_results[i] << std::endl;
 		if (compare_vec(all_results[i], std_permuted) == false)
 		{
 			std::cout << "string not equal at index: " << i << std::endl;
@@ -437,5 +465,4 @@ void usage_of_perm_by_idx()
 		}
 		std::next_permutation(std_permuted.begin(), std_permuted.end());
 	}
-
 }

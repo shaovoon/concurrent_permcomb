@@ -12,6 +12,7 @@ void unit_test_threaded_predicate();
 void unit_test_threaded_shard();
 void unit_test_comb_by_idx();
 void usage_of_comb_by_idx();
+void usage_of_next_comb();
 void benchmark_comb();
 
 template<typename T>
@@ -273,6 +274,8 @@ int main(int argc, char* argv[])
 
 	usage_of_comb_by_idx();
 
+	//usage_of_next_comb();
+
 	return 0;
 }
 
@@ -443,6 +446,44 @@ void unit_test_comb_by_idx()
 
 }
 
+void usage_of_next_comb()
+{
+	std::string original_text = "123456";
+	std::string std_combined = "123";
+	uint64_t total = 0;
+	if(concurrent_comb::compute_total_comb(original_text.size(), std_combined.size(), total))
+	{
+		std::cout << std_combined << std::endl;
+		for (uint64_t i = 1; i < total; ++i)
+		{
+			boost::next_combination(original_text.begin(), original_text.end(), std_combined.begin(), std_combined.end());
+			std::cout << std_combined << std::endl;
+		}
+	}
+	/* output 
+	123
+	124
+	125
+	126
+	134
+	135
+	136
+	145
+	146
+	156
+	234
+	235
+	236
+	245
+	246
+	256
+	345
+	346
+	356
+	456
+	*/
+}
+
 void usage_of_comb_by_idx()
 {
 	uint64_t index_to_find = 0;
@@ -469,10 +510,12 @@ void usage_of_comb_by_idx()
 
 		index_to_find += repeat_times;
 	}
+
 	// Checking if all_results is correct
 	std_combined = "123";
 	for (size_t i = 0; i < all_results.size(); ++i)
 	{
+		std::cout << all_results[i] << std::endl;
 		if (compare_vec(all_results[i], std_combined) == false)
 		{
 			std::cout << "string not equal at index: " << i << std::endl;
