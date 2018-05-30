@@ -410,19 +410,23 @@ void usage_of_perm_by_idx()
 	{
 		std::string permuted = concurrent_perm::find_perm_by_idx(index_to_find, original_text);
 
-		all_results.push_back(permuted);
-		std::thread th([&permuted, &all_results, repeat_times] {
+		std::thread th([permuted, &all_results, repeat_times] () mutable {
 
+			// do your work on the permuted result, instead of pushing to vector
+			all_results.push_back(permuted); 
 			for (size_t j=1; j<repeat_times; ++j)
 			{
 				std::next_permutation(permuted.begin(), permuted.end());
-				all_results.push_back(permuted);
+				// do your work on the permuted result, instead of pushing to vector
+				all_results.push_back(permuted); 
 			}
 		});
 		th.join();
 
 		index_to_find += repeat_times;
 	}
+
+	// Checking if all_results is correct
 	std_permuted = "12345";
 	for (size_t i = 0; i < all_results.size(); ++i)
 	{

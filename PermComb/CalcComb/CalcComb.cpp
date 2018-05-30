@@ -454,12 +454,14 @@ void usage_of_comb_by_idx()
 	{
 		std::string combined = concurrent_comb::find_comb_by_idx(std_combined.size(), index_to_find, original_text);
 
-		all_results.push_back(combined);
-		std::thread th([&original_text, &combined, &all_results, repeat_times] {
+		std::thread th([original_text, combined, &all_results, repeat_times] () mutable {
 
+			// do your work on the combined result, instead of pushing to vector
+			all_results.push_back(combined);
 			for (size_t j = 1; j < repeat_times; ++j)
 			{
 				boost::next_combination(original_text.begin(), original_text.end(), combined.begin(), combined.end());
+				// do your work on the combined result, instead of pushing to vector
 				all_results.push_back(combined);
 			}
 		});
@@ -467,6 +469,7 @@ void usage_of_comb_by_idx()
 
 		index_to_find += repeat_times;
 	}
+	// Checking if all_results is correct
 	std_combined = "123";
 	for (size_t i = 0; i < all_results.size(); ++i)
 	{
