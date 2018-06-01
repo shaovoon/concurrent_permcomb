@@ -4,6 +4,7 @@
 //#include <boost/multiprecision/cpp_int.hpp>
 #include "../permcomb/concurrent_comb.h"
 #include "../common/timer.h"
+#include "other_combination.h"
 
 void test_find_comb(uint32_t fullset, uint32_t subset);
 void unit_test();
@@ -13,6 +14,9 @@ void unit_test_threaded_shard();
 void unit_test_comb_by_idx();
 void usage_of_comb_by_idx();
 void usage_of_next_comb();
+void usage_of_next_comb_with_state();
+void usage_of_other_next_comb();
+void usage_of_other_next_pcomb();
 void benchmark_comb();
 
 template<typename T>
@@ -72,7 +76,7 @@ bool test_threaded_comb_predicate(int_type thread_cnt, uint32_t fullset_size, ui
 	do
 	{
 		vecvec.push_back(std::vector<uint32_t>(subset.begin(), subset.end()));
-	} while (boost::next_combination(fullset.begin(), fullset.end(), subset.begin(), subset.end(), [](uint32_t a, uint32_t b) { return a == b; }));
+	} while (stdcomb::next_combination(fullset.begin(), fullset.end(), subset.begin(), subset.end(), [](uint32_t a, uint32_t b) { return a == b; }));
 
 	// compare results
 	size_t cnt = 0;
@@ -133,7 +137,7 @@ bool test_threaded_comb(int_type thread_cnt, uint32_t fullset_size, uint32_t sub
 	do
 	{
 		vecvec.push_back(std::vector<uint32_t>(subset.begin(), subset.end()));
-	} while (boost::next_combination(fullset.begin(), fullset.end(), subset.begin(), subset.end()));
+	} while (stdcomb::next_combination(fullset.begin(), fullset.end(), subset.begin(), subset.end()));
 
 	// compare results
 	size_t cnt = 0;
@@ -204,7 +208,7 @@ bool test_threaded_comb_shard(int_type thread_cnt, uint32_t fullset_size, uint32
 	do
 	{
 		vecvec.push_back(std::vector<uint32_t>(subset.begin(), subset.end()));
-	} while (boost::next_combination(fullset.begin(), fullset.end(), subset.begin(), subset.end()));
+	} while (stdcomb::next_combination(fullset.begin(), fullset.end(), subset.begin(), subset.end()));
 
 	// compare results
 	size_t cnt = 0;
@@ -272,9 +276,15 @@ int main(int argc, char* argv[])
 
 	//unit_test_comb_by_idx();
 
-	usage_of_comb_by_idx();
+	//usage_of_comb_by_idx();
 
-	//usage_of_next_comb();
+	usage_of_next_comb();
+
+	usage_of_next_comb_with_state();
+
+	usage_of_other_next_comb();
+
+	usage_of_other_next_pcomb();
 
 	return 0;
 }
@@ -291,7 +301,7 @@ void benchmark_comb()
 		std::vector<int> subset_vec(fullset_vec.begin(), fullset_vec.begin()+ subset);
 
 		stopwatch.start("next_combination");
-		while (boost::next_combination(fullset_vec2.begin(), fullset_vec2.end(), subset_vec.begin(), subset_vec.end()))
+		while (stdcomb::next_combination(fullset_vec2.begin(), fullset_vec2.end(), subset_vec.begin(), subset_vec.end()))
 		{
 
 		}
@@ -360,7 +370,7 @@ void test_find_comb(uint32_t fullset, uint32_t subset)
 				//display(results1);
 			}
 		}
-		boost::next_combination(fullset_vec.begin(), fullset_vec.end(), results2.begin(), results2.end());
+		stdcomb::next_combination(fullset_vec.begin(), fullset_vec.end(), results2.begin(), results2.end());
 	}
 	std::cout << "test_find_comb(" << fullset << "," << subset << ") finished with" << ((error) ? " errors" : " no errors") << std::endl;
 }
@@ -441,26 +451,172 @@ void unit_test_comb_by_idx()
 			break;
 		}
 		++index_to_find;
-		boost::next_combination(original_text.begin(), original_text.end(), std_combined.begin(), std_combined.end());
+		stdcomb::next_combination(original_text.begin(), original_text.end(), std_combined.begin(), std_combined.end());
 	}
 
 }
 
 void usage_of_next_comb()
 {
-	std::string original_text = "123456";
-	std::string std_combined = "123";
+	std::string original_text = "1234567890ABCDEFGHIJKLMNO";
+	std::string std_combined = "12345678";
 	uint64_t total = 0;
 	if(concurrent_comb::compute_total_comb(original_text.size(), std_combined.size(), total))
 	{
-		std::cout << std_combined << std::endl;
+		timer stopwatch;
+		stopwatch.start("next_comb");
+
+		//std::cout << std_combined << std::endl;
 		for (uint64_t i = 1; i < total; ++i)
 		{
-			boost::next_combination(original_text.begin(), original_text.end(), std_combined.begin(), std_combined.end());
-			std::cout << std_combined << std::endl;
+			stdcomb::next_combination(original_text.begin(), original_text.end(), std_combined.begin(), std_combined.end());
+			//std::cout << std_combined << std::endl;
 		}
+		stopwatch.stop();
 	}
-	/* output 
+	std::cout << std_combined << std::endl;
+	/* output
+	123
+	124
+	125
+	126
+	134
+	135
+	136
+	145
+	146
+	156
+	234
+	235
+	236
+	245
+	246
+	256
+	345
+	346
+	356
+	456
+	*/
+}
+
+void usage_of_other_next_comb()
+{
+	std::string original_text = "1234567890ABCDEFGHIJKLMNO";
+	std::string std_combined = "12345678";
+	uint64_t total = 0;
+	if (concurrent_comb::compute_total_comb(original_text.size(), std_combined.size(), total))
+	{
+		timer stopwatch;
+		stopwatch.start("next_comb");
+
+		//std::cout << std_combined << std::endl;
+		for (uint64_t i = 1; i < total; ++i)
+		{
+			other::other_next_combination2(original_text.begin(), original_text.end(), std_combined.size());
+			//std::cout << std_combined << std::endl;
+		}
+		stopwatch.stop();
+	}
+	std::cout << original_text << std::endl;
+	/* output
+	123
+	124
+	125
+	126
+	134
+	135
+	136
+	145
+	146
+	156
+	234
+	235
+	236
+	245
+	246
+	256
+	345
+	346
+	356
+	456
+	*/
+}
+
+void usage_of_other_next_pcomb()
+{
+	std::string original_text = "1234567890ABCDEF";
+	std::string std_combined = "12345678";
+	uint64_t total = 0;
+	if (concurrent_comb::compute_total_comb(original_text.size(), std_combined.size(), total))
+	{
+		timer stopwatch;
+		stopwatch.start("next_pcomb");
+
+		//std::cout << std_combined << std::endl;
+		for (uint64_t i = 1; i < total; ++i)
+		{
+			other::other_next_combination1(original_text.begin(), original_text.begin()+ std_combined.size(), original_text.end());
+			//std::cout << std_combined << std::endl;
+		}
+		stopwatch.stop();
+	}
+	std::cout << original_text << std::endl;
+	/* output
+	123
+	124
+	125
+	126
+	134
+	135
+	136
+	145
+	146
+	156
+	234
+	235
+	236
+	245
+	246
+	256
+	345
+	346
+	356
+	456
+	*/
+}
+
+void usage_of_next_comb_with_state()
+{
+	std::string original_text = "1234567890ABCDEFGHIJKLMNO";
+	std::string std_combined = "12345678";
+	uint64_t total = 0;
+	std::vector<std::string::iterator> state;
+	std::string::iterator it = original_text.begin();
+	for (size_t j = 0; j < std_combined.size(); ++j, ++it)
+	{
+		state.push_back(it);
+	}
+	if (concurrent_comb::compute_total_comb(original_text.size(), std_combined.size(), total))
+	{
+		timer stopwatch;
+		stopwatch.start("next_comb_with_state");
+
+		//std::cout << std_combined << std::endl;
+		for (uint64_t i = 1; i < total; ++i)
+		{
+			//boost::next_combination_with_state2(original_text.begin(), original_text.end(), state);
+			stdcomb::next_combination_with_state2(original_text.begin(), original_text.end(), state.begin(), state.end());
+			//std::cout << std_combined << std::endl;
+		}
+		stopwatch.stop();
+
+	}
+	for (size_t j = 0; j < std_combined.size(); ++j, ++it)
+	{
+		std_combined[j] = *state[j];
+	}
+	std::cout << std_combined << std::endl;
+	/* output
 	123
 	124
 	125
@@ -501,7 +657,7 @@ void usage_of_comb_by_idx()
 			all_results.push_back(combined);
 			for (size_t j = 1; j < repeat_times; ++j)
 			{
-				boost::next_combination(original_text.begin(), original_text.end(), combined.begin(), combined.end());
+				stdcomb::next_combination(original_text.begin(), original_text.end(), combined.begin(), combined.end());
 				// do your work on the combined result, instead of pushing to vector
 				all_results.push_back(combined);
 			}
@@ -521,7 +677,7 @@ void usage_of_comb_by_idx()
 			std::cout << "string not equal at index: " << i << std::endl;
 			break;
 		}
-		boost::next_combination(original_text.begin(), original_text.end(), std_combined.begin(), std_combined.end());
+		stdcomb::next_combination(original_text.begin(), original_text.end(), std_combined.begin(), std_combined.end());
 	}
 
 }

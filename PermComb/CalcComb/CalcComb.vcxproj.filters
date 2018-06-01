@@ -32,5 +32,8 @@
     <ClInclude Include="..\common\timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="other_combination.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -10,8 +10,11 @@
 
 #pragma once
 
-namespace boost
+#include <iterator>
+
+namespace stdcomb
 {
+
 
 // Non recursive template function
 template <class BidIt>
@@ -73,6 +76,136 @@ BidIt r_begin, BidIt r_end)
 
   return true;//will never reach here    
 }
+
+// experimental
+template <class BidIt, class BidItIt>
+
+inline bool next_combination_with_state(BidIt n_begin, BidIt n_end,
+	BidIt r_begin, BidIt r_end, BidItIt r_beginIT, BidItIt r_endIT)
+{
+	bool boolmarked = false;
+	typename std::reverse_iterator<BidItIt> r_marked;
+
+	auto rbegin = std::make_reverse_iterator(r_endIT);
+	auto rend = std::make_reverse_iterator(r_beginIT);
+
+
+	BidIt n_it1 = n_end;
+	--n_it1;
+
+
+	BidIt tmp_r_end = r_end;
+	--tmp_r_end;
+
+	for(auto it=rbegin; it!=rend; ++it, --n_it1)
+	{ 
+		BidIt r_it1 = *it;
+
+		if (r_it1 == n_it1)
+		{
+			if (it != rend) //to ensure not at the start of r sequence
+			{
+				boolmarked = true;
+				r_marked = ++it;
+				--it;//add it back again 
+				continue;
+			}
+			else // it means it is at the start the sequence, so return false
+				return false;
+		}
+		else //if(r_it1!=n_it1 )
+		{
+			//marked code
+			if (boolmarked == true)
+			{
+				auto prev = r_marked;
+				BidIt n_it3 = ++(*r_marked);
+				auto r_it2 = prev;
+				for (; r_it2 != rbegin; --r_it2, ++n_it3)
+				{
+					*r_it2 = n_it3;
+				}
+				*r_it2 = n_it3;
+				BidIt rit = r_begin;
+				for (auto sit = r_beginIT; sit != r_endIT && rit != r_end; ++sit, ++rit)
+				{
+					//if (**sit != *rit)
+					{
+						*rit = **sit;
+					}
+				}
+				return true;
+			}
+			++(*it);
+			BidIt rit = r_begin;
+			for (auto sit = r_beginIT; sit != r_endIT && rit != r_end; ++sit, ++rit)
+			{
+				//if (**sit != *rit)
+				{
+					*rit = **sit;
+				}
+			}
+			return true;
+		}
+	}
+
+	return true;//will never reach here    
+}
+
+
+// experimental
+template <class BidIt, class BidItIt>
+inline bool next_combination_with_state2(BidIt n_begin, BidIt n_end,
+	BidItIt r_beginIT, BidItIt r_endIT)
+{
+	bool boolmarked = false;
+	typename std::reverse_iterator<BidItIt> r_marked;
+
+	auto rbegin = std::make_reverse_iterator(r_endIT);
+	auto rend = std::make_reverse_iterator(r_beginIT);
+
+	BidIt n_it1 = n_end;
+	--n_it1;
+
+	for (auto it = rbegin; it != rend; ++it, --n_it1)
+	{
+		BidIt r_it1 = *it;
+
+		if (r_it1 == n_it1)
+		{
+			if (it != rend) //to ensure not at the start of r sequence
+			{
+				boolmarked = true;
+				r_marked = ++it;
+				--it;//add it back again 
+				continue;
+			}
+			else // it means it is at the start the sequence, so return false
+				return false;
+		}
+		else //if(r_it1!=n_it1 )
+		{
+			//marked code
+			if (boolmarked == true)
+			{
+				auto prev = r_marked;
+				BidIt n_it3 = ++(*r_marked);
+				auto r_it2 = prev;
+				for (; r_it2 != rbegin; --r_it2, ++n_it3)
+				{
+					*r_it2 = n_it3;
+				}
+				*r_it2 = n_it3;
+				return true;
+			}
+			++(*it);
+			return true;
+		}
+	}
+
+	return true;//will never reach here    
+}
+
 
 // Non recursive template function with Pred
 template <class BidIt, class Prediate>
@@ -138,7 +271,6 @@ inline bool next_combination(
 
   return true;//will never reach here    
 }
-
 
 // Non recursive template function
 template <class BidIt>

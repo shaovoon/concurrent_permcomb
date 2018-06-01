@@ -11,11 +11,11 @@ public:
 	void start(const std::string& text_)
 	{
 		text = text_;
-		begin = std::chrono::high_resolution_clock::now();
+		begin = std::chrono::system_clock::now();
 	}
 	void stop()
 	{
-		auto end = std::chrono::high_resolution_clock::now();
+		auto end = std::chrono::system_clock::now();
 		auto dur = end - begin;
 		auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(dur).count();
 		std::cout << std::setw(16) << text << ":" << std::setw(5) << ms << "ms" << std::endl;
@@ -23,5 +23,5 @@ public:
 
 private:
 	std::string text;
-	std::chrono::high_resolution_clock::time_point begin;
+	std::chrono::system_clock::time_point begin;
 };

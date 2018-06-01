@@ -211,7 +211,7 @@ comb_loop(const int thread_index, container_type& cont_full_set, container_type&
         {
             if (!callback(thread_index, cont_full_set.size(), cont))
                 return;
-            boost::next_combination(cont_full_set.begin(), cont_full_set.end(), cont.begin(), cont.end(), pred);
+            stdcomb::next_combination(cont_full_set.begin(), cont_full_set.end(), cont.begin(), cont.end(), pred);
         }
     }
     catch(std::exception& ex)
@@ -245,7 +245,7 @@ comb_loop(const int thread_index, container_type& cont_full_set, container_type&
         {
             if (!callback(thread_index, cont_full_set.size(), cont))
                 return;
-            boost::next_combination(cont_full_set.begin(), cont_full_set.end(), cont.begin(), cont.end());
+            stdcomb::next_combination(cont_full_set.begin(), cont_full_set.end(), cont.begin(), cont.end());
         }
     }
     catch(std::exception& ex)
