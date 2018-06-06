@@ -149,7 +149,7 @@ inline bool next_combination_with_state(BidIt n_begin, BidIt n_end,
 		}
 	}
 
-	return true;//will never reach here    
+	return false; // will reach here at the last combination
 }
 
 
@@ -203,7 +203,7 @@ inline bool next_combination_with_state2(BidIt n_begin, BidIt n_end,
 		}
 	}
 
-	return true;//will never reach here    
+	return false; // will reach here at the last combination
 }
 
 
