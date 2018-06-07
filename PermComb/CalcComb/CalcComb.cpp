@@ -604,8 +604,7 @@ void usage_of_next_comb_with_state()
 		//std::cout << std_combined << std::endl;
 		for (uint64_t i = 1; i < total; ++i)
 		{
-			//boost::next_combination_with_state2(original_text.begin(), original_text.end(), state);
-			stdcomb::next_combination_with_state2(original_text.begin(), original_text.end(), state.begin(), state.end());
+			stdcomb::next_combination_with_state(original_text.begin(), original_text.end(), state.begin(), state.end());
 			//std::cout << std_combined << std::endl;
 		}
 		stopwatch.stop();
