@@ -5,6 +5,7 @@
 #include "../permcomb/concurrent_comb.h"
 #include "../common/timer.h"
 #include "other_combination.h"
+#include "../discreture/discreture.hpp"
 
 void test_find_comb(uint32_t fullset, uint32_t subset);
 void unit_test();
@@ -18,6 +19,7 @@ void usage_of_next_comb_with_state();
 void usage_of_other_next_comb();
 void usage_of_other_next_pcomb();
 void benchmark_comb();
+void usage_of_discreture();
 
 template<typename T>
 bool compare_vec(T& results1, T& results2)
@@ -282,9 +284,11 @@ int main(int argc, char* argv[])
 
 	usage_of_next_comb_with_state();
 
-	usage_of_other_next_comb();
+	//usage_of_other_next_comb();
 
-	usage_of_other_next_pcomb();
+	//usage_of_other_next_pcomb();
+
+	usage_of_discreture();
 
 	return 0;
 }
@@ -475,28 +479,25 @@ void usage_of_next_comb()
 		stopwatch.stop();
 	}
 	std::cout << std_combined << std::endl;
-	/* output
-	123
-	124
-	125
-	126
-	134
-	135
-	136
-	145
-	146
-	156
-	234
-	235
-	236
-	245
-	246
-	256
-	345
-	346
-	356
-	456
-	*/
+}
+
+void usage_of_discreture()
+{
+	std::string original_text = "1234567890ABCDEFGHIJKLMNO";
+	std::string std_combined = "12345678";
+	timer stopwatch;
+	stopwatch.start("discreture");
+
+	using namespace dscr;
+	//std::cout << std_combined << std::endl;
+	int i = 0;
+	for (auto& x : combinations(original_text, 8))
+	{
+		++i;
+	}
+
+	stopwatch.stop();
+	std::cout << i << std::endl;
 }
 
 void usage_of_other_next_comb()
