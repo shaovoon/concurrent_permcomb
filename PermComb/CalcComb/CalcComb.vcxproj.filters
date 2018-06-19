@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
-    <Filter Include="discreture">
-      <UniqueIdentifier>{b3efc9cd-6cc7-4f35-8653-b995f11a707d}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CalcComb.cpp">
@@ -34,75 +31,6 @@
     </ClInclude>
     <ClInclude Include="..\common\timer.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="other_combination.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\discreture.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\AggregationView.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\ArithmeticProgression.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\Combinations.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\CombinationTree.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\CombinationTreePrunned.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\CompoundContainer.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\detail_combinations_bf.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\detail_combinations_tree_bf.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\DyckPaths.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\IntegerInterval.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\Misc.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\Motzkin.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\Multisets.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\Parallel.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\Partitions.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\Permutations.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\Probability.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\Sequences.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\SetPartitions.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\TimeHelpers.hpp">
-      <Filter>discreture</Filter>
-    </ClInclude>
-    <ClInclude Include="..\discreture\Discreture\VectorHelpers.hpp">
-      <Filter>discreture</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

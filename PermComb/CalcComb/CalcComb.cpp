@@ -4,8 +4,6 @@
 //#include <boost/multiprecision/cpp_int.hpp>
 #include "../permcomb/concurrent_comb.h"
 #include "../common/timer.h"
-#include "other_combination.h"
-#include "../discreture/discreture.hpp"
 
 void test_find_comb(uint32_t fullset, uint32_t subset);
 void unit_test();
@@ -16,10 +14,7 @@ void unit_test_comb_by_idx();
 void usage_of_comb_by_idx();
 void usage_of_next_comb();
 void usage_of_next_comb_with_state();
-void usage_of_other_next_comb();
-void usage_of_other_next_pcomb();
 void benchmark_comb();
-void usage_of_discreture();
 
 template<typename T>
 bool compare_vec(T& results1, T& results2)
@@ -284,12 +279,6 @@ int main(int argc, char* argv[])
 
 	usage_of_next_comb_with_state();
 
-	//usage_of_other_next_comb();
-
-	//usage_of_other_next_pcomb();
-
-	usage_of_discreture();
-
 	return 0;
 }
 
@@ -479,111 +468,6 @@ void usage_of_next_comb()
 		stopwatch.stop();
 	}
 	std::cout << std_combined << std::endl;
-}
-
-void usage_of_discreture()
-{
-	std::string original_text = "1234567890ABCDEFGHIJKLMNO";
-	std::string std_combined = "12345678";
-	timer stopwatch;
-	stopwatch.start("discreture");
-
-	using namespace dscr;
-	//std::cout << std_combined << std::endl;
-	int i = 0;
-	for (auto& x : combinations(original_text, 8))
-	{
-		++i;
-	}
-
-	stopwatch.stop();
-	std::cout << i << std::endl;
-}
-
-void usage_of_other_next_comb()
-{
-	std::string original_text = "1234567890ABCDEFGHIJKLMNO";
-	std::string std_combined = "12345678";
-	uint64_t total = 0;
-	if (concurrent_comb::compute_total_comb(original_text.size(), std_combined.size(), total))
-	{
-		timer stopwatch;
-		stopwatch.start("next_comb");
-
-		//std::cout << std_combined << std::endl;
-		for (uint64_t i = 1; i < total; ++i)
-		{
-			other::other_next_combination2(original_text.begin(), original_text.end(), std_combined.size());
-			//std::cout << std_combined << std::endl;
-		}
-		stopwatch.stop();
-	}
-	std::cout << original_text << std::endl;
-	/* output
-	123
-	124
-	125
-	126
-	134
-	135
-	136
-	145
-	146
-	156
-	234
-	235
-	236
-	245
-	246
-	256
-	345
-	346
-	356
-	456
-	*/
-}
-
-void usage_of_other_next_pcomb()
-{
-	std::string original_text = "1234567890ABCDEF";
-	std::string std_combined = "12345678";
-	uint64_t total = 0;
-	if (concurrent_comb::compute_total_comb(original_text.size(), std_combined.size(), total))
-	{
-		timer stopwatch;
-		stopwatch.start("next_pcomb");
-
-		//std::cout << std_combined << std::endl;
-		for (uint64_t i = 1; i < total; ++i)
-		{
-			other::other_next_combination1(original_text.begin(), original_text.begin()+ std_combined.size(), original_text.end());
-			//std::cout << std_combined << std::endl;
-		}
-		stopwatch.stop();
-	}
-	std::cout << original_text << std::endl;
-	/* output
-	123
-	124
-	125
-	126
-	134
-	135
-	136
-	145
-	146
-	156
-	234
-	235
-	236
-	245
-	246
-	256
-	345
-	346
-	356
-	456
-	*/
 }
 
 void usage_of_next_comb_with_state()

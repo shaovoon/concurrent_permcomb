@@ -167,31 +167,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\common\timer.h" />
-    <ClInclude Include="..\discreture\discreture.hpp" />
-    <ClInclude Include="..\discreture\Discreture\AggregationView.hpp" />
-    <ClInclude Include="..\discreture\Discreture\ArithmeticProgression.hpp" />
-    <ClInclude Include="..\discreture\Discreture\Combinations.hpp" />
-    <ClInclude Include="..\discreture\Discreture\CombinationTree.hpp" />
-    <ClInclude Include="..\discreture\Discreture\CombinationTreePrunned.hpp" />
-    <ClInclude Include="..\discreture\Discreture\CompoundContainer.hpp" />
-    <ClInclude Include="..\discreture\Discreture\detail_combinations_bf.hpp" />
-    <ClInclude Include="..\discreture\Discreture\detail_combinations_tree_bf.hpp" />
-    <ClInclude Include="..\discreture\Discreture\DyckPaths.hpp" />
-    <ClInclude Include="..\discreture\Discreture\IntegerInterval.hpp" />
-    <ClInclude Include="..\discreture\Discreture\Misc.hpp" />
-    <ClInclude Include="..\discreture\Discreture\Motzkin.hpp" />
-    <ClInclude Include="..\discreture\Discreture\Multisets.hpp" />
-    <ClInclude Include="..\discreture\Discreture\Parallel.hpp" />
-    <ClInclude Include="..\discreture\Discreture\Partitions.hpp" />
-    <ClInclude Include="..\discreture\Discreture\Permutations.hpp" />
-    <ClInclude Include="..\discreture\Discreture\Probability.hpp" />
-    <ClInclude Include="..\discreture\Discreture\Sequences.hpp" />
-    <ClInclude Include="..\discreture\Discreture\SetPartitions.hpp" />
-    <ClInclude Include="..\discreture\Discreture\TimeHelpers.hpp" />
-    <ClInclude Include="..\discreture\Discreture\VectorHelpers.hpp" />
     <ClInclude Include="..\permcomb\combination.h" />
     <ClInclude Include="..\permcomb\concurrent_comb.h" />
-    <ClInclude Include="other_combination.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
