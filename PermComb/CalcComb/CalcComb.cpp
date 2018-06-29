@@ -14,6 +14,7 @@ void unit_test_comb_by_idx();
 void usage_of_comb_by_idx();
 void usage_of_next_comb();
 void usage_of_next_comb_with_state();
+void usage_of_comb_state_by_idx();
 void benchmark_comb();
 
 template<typename T>
@@ -29,6 +30,23 @@ bool compare_vec(T& results1, T& results2)
 	}
 	return true;
 }
+
+template<typename T1, typename T2>
+bool compare_vec2(T1& results1, T2& results2)
+{
+	if (results1.size() != results2.size())
+		return false;
+
+	for (size_t i = 0; i < results1.size(); ++i)
+	{
+		if (*results1[i] != results2[i])
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
 
 template<typename T>
 void display(T& results)
@@ -273,11 +291,13 @@ int main(int argc, char* argv[])
 
 	//unit_test_comb_by_idx();
 
+	//usage_of_next_comb();
+
+	//usage_of_next_comb_with_state();
+
 	//usage_of_comb_by_idx();
 
-	usage_of_next_comb();
-
-	usage_of_next_comb_with_state();
+	usage_of_comb_state_by_idx();
 
 	return 0;
 }
@@ -472,8 +492,12 @@ void usage_of_next_comb()
 
 void usage_of_next_comb_with_state()
 {
-	std::string original_text = "1234567890ABCDEFGHIJKLMNO";
-	std::string std_combined = "12345678";
+	//std::string original_text = "1234567890ABCDEFGHIJKLMNO";
+	//std::string std_combined = "12345678";
+
+	std::string original_text = "123456";
+	std::string std_combined = "123";
+
 	uint64_t total = 0;
 	std::vector<std::string::iterator> state;
 	std::string::iterator it = original_text.begin();
@@ -491,15 +515,35 @@ void usage_of_next_comb_with_state()
 		{
 			stdcomb::next_combination_with_state(original_text.begin(), original_text.end(), state.begin(), state.end());
 			//std::cout << std_combined << std::endl;
+			for (auto s : state)
+			{
+				std::cout << *s;
+			}
+			std::cout << std::endl;
 		}
 		stopwatch.stop();
 
 	}
+/*
+	// Checking if all_results is correct
+	std_combined = "123";
+	for (size_t i = 0; i < all_results.size(); ++i)
+	{
+		//std::cout << all_results[i] << std::endl;
+		if (compare_vec2(all_results[i], std_combined) == false)
+		{
+			std::cout << "string not equal at index: " << i << std::endl;
+			break;
+		}
+		stdcomb::next_combination(original_text.begin(), original_text.end(), std_combined.begin(), std_combined.end());
+	}
+
 	for (size_t j = 0; j < std_combined.size(); ++j, ++it)
 	{
 		std_combined[j] = *state[j];
 	}
 	std::cout << std_combined << std::endl;
+	*/
 	/* output
 	123
 	124
@@ -557,6 +601,54 @@ void usage_of_comb_by_idx()
 	{
 		std::cout << all_results[i] << std::endl;
 		if (compare_vec(all_results[i], std_combined) == false)
+		{
+			std::cout << "string not equal at index: " << i << std::endl;
+			break;
+		}
+		stdcomb::next_combination(original_text.begin(), original_text.end(), std_combined.begin(), std_combined.end());
+	}
+
+}
+
+
+void usage_of_comb_state_by_idx()
+{
+	uint64_t index_to_find = 0;
+	std::string original_text = "123456";
+	std::string std_combined = "123";
+	std::vector< std::vector<std::string::iterator> > all_results;
+	size_t repeat_times = 5;
+	for (size_t i = 0; i < 4; ++i)
+	{
+		std::vector<std::string::iterator> combined = concurrent_comb::find_comb_state_by_idx(std_combined.size(), index_to_find, original_text);
+
+		std::thread th([&original_text, combined, &all_results, repeat_times]() mutable {
+
+			// do your work on the combined result, instead of pushing to vector
+			all_results.push_back(combined);
+			for (size_t j = 1; j < repeat_times; ++j)
+			{
+				stdcomb::next_combination_with_state(original_text.begin(), original_text.end(), combined.begin(), combined.end());
+				// do your work on the combined result, instead of pushing to vector
+				all_results.push_back(combined);
+			}
+		});
+		th.join();
+
+		index_to_find += repeat_times;
+	}
+
+	// Checking if all_results is correct
+	std_combined = "123";
+	for (size_t i = 0; i < all_results.size(); ++i)
+	{
+		//std::cout << all_results[i] << std::endl;
+		for (auto s : all_results[i])
+		{
+			std::cout << *s;
+		}
+		std::cout << std::endl;
+		if (compare_vec2(all_results[i], std_combined) == false)
 		{
 			std::cout << "string not equal at index: " << i << std::endl;
 			break;
