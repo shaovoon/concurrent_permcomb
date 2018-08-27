@@ -57,3 +57,5 @@
 *.db-wal
 *.db-shm
 *.ipch
+
+PermComb/.vs/
