@@ -91,6 +91,12 @@ bool compute_total_comb( const uint32_t fullset, const uint32_t subset, int_type
 	return true;
 }
 
+template<typename int_type>
+bool find_comb(const uint32_t fullset, 
+			   const uint32_t subset, 
+			   int_type index_to_find,
+			   std::vector<uint32_t>& results );
+
 template<typename int_type, typename vector_type>
 vector_type find_comb_by_idx(const uint32_t subset,
 	int_type index_to_find,
