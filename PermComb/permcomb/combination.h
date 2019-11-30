@@ -76,7 +76,11 @@ BidIt r_begin, BidIt r_end)
 
   return true;//will never reach here    
 }
-
+template< class Iterator >
+std::reverse_iterator<Iterator> make_reverse_iterator(Iterator i)
+{
+    return std::reverse_iterator<Iterator>(i);
+}
 // experimental
 template <class BidIt, class BidItIt>
 inline bool next_combination_with_state(BidIt n_begin, BidIt n_end,
@@ -85,8 +89,8 @@ inline bool next_combination_with_state(BidIt n_begin, BidIt n_end,
 	bool boolmarked = false;
 	typename std::reverse_iterator<BidItIt> r_marked;
 
-	auto rbegin = std::make_reverse_iterator(r_endIT);
-	auto rend = std::make_reverse_iterator(r_beginIT);
+	auto rbegin = make_reverse_iterator(r_endIT);
+	auto rend = make_reverse_iterator(r_beginIT);
 
 	BidIt n_it1 = n_end;
 	--n_it1;
