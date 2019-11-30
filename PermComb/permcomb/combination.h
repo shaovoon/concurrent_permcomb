@@ -89,8 +89,8 @@ inline bool next_combination_with_state(BidIt n_begin, BidIt n_end,
 	bool boolmarked = false;
 	typename std::reverse_iterator<BidItIt> r_marked;
 
-	auto rbegin = make_reverse_iterator(r_endIT);
-	auto rend = make_reverse_iterator(r_beginIT);
+	auto rbegin = stdcomb::make_reverse_iterator(r_endIT);
+	auto rend = stdcomb::make_reverse_iterator(r_beginIT);
 
 	BidIt n_it1 = n_end;
 	--n_it1;
