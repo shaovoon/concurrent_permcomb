@@ -65,38 +65,38 @@ Use `compute_total_comb` to calculate total combination count.
 ```cpp
 // compute_all_perm function signature
 template<typename int_type, typename container_type, typename callback_type, 
-	typename error_callback_type, typename predicate_type = no_predicate_type>
+    typename error_callback_type, typename predicate_type = no_predicate_type>
 bool compute_all_perm(int_type thread_cnt, const container_type& cont, callback_type callback, 
-	error_callback_type err_callback, predicate_type pred = predicate_type());
+    error_callback_type err_callback, predicate_type pred = predicate_type());
 
 // callback_type signature
 template<typename container_type>
 struct callback_t
 {
-	bool operator()(const int thread_index, const container_type& cont)
-	{
-		return true; // can return false to cancel processing in current thread
-	}
+    bool operator()(const int thread_index, const container_type& cont)
+    {
+        return true; // can return false to cancel processing in current thread
+    }
 };
 
 // error_callback_type example
 template<typename container_type>
 struct error_callback_t
 {
-	void operator()(const int thread_index, const container_type& cont, const std::string& error)
-	{
-		std::cerr << error << std::endl;
-	}
+    void operator()(const int thread_index, const container_type& cont, const std::string& error)
+    {
+        std::cerr << error << std::endl;
+    }
 };
 
 // predicate_type example
 template<typename T>
 struct predicate_t
 {
-	bool operator()(T a, T b)
-	{
-		return a < b;
-	}
+    bool operator()(T a, T b)
+    {
+        return a < b;
+    }
 };
 ```
 
@@ -113,10 +113,10 @@ void main()
     int64_t thread_cnt = 2;
 
     concurrent_perm::compute_all_perm(thread_cnt, results, 
-		[](const int thread_index, const std::string& cont) 
-			{ return true; } /* evaluation callback */,
-		[](const int thread_index, const std::string& cont, const std::string& error) 
-			{ std::cerr << error; } /* error callback */           
+        [](const int thread_index, const std::string& cont) 
+            { return true; } /* evaluation callback */,
+        [](const int thread_index, const std::string& cont, const std::string& error) 
+            { std::cerr << error; } /* error callback */           
         );
 }
 ```
@@ -134,13 +134,13 @@ void main()
     int64_t thread_cnt = 2;
 
     concurrent_perm::compute_all_perm(thread_cnt, results, 
-		[](const int thread_index, const std::string& cont) 
-			{ return true; } /* evaluation callback */,
-		[](const int thread_index, const std::string& cont, const std::string& error) 
-			{ std::cerr << error; } /* error callback */,            
-		[](char a, char b) 
-			{ return a < b; } /* predicate */
-		);
+        [](const int thread_index, const std::string& cont) 
+            { return true; } /* evaluation callback */,
+        [](const int thread_index, const std::string& cont, const std::string& error) 
+            { std::cerr << error; } /* error callback */,            
+        [](char a, char b) 
+            { return a < b; } /* predicate */
+        );
 }
 ```
 
@@ -149,29 +149,29 @@ void main()
 ```cpp
 // compute_all_comb function signature
 template<typename int_type, typename container_type, typename callback_type, 
-	typename error_callback_type, typename predicate_type = no_predicate_type>
+    typename error_callback_type, typename predicate_type = no_predicate_type>
 bool compute_all_comb(int_type thread_cnt, uint32_t subset, const container_type& cont, 
-	callback_type callback, error_callback_type err_callback, predicate_type pred = predicate_type())
+    callback_type callback, error_callback_type err_callback, predicate_type pred = predicate_type())
 
 // callback_type signature
 template<typename container_type>
 struct callback_t
 {
-	bool operator()(const int thread_index, const size_t fullset_size, const container_type& cont)
-	{
-		return true; // can return false to cancel processing in current thread
-	}
+    bool operator()(const int thread_index, const size_t fullset_size, const container_type& cont)
+    {
+        return true; // can return false to cancel processing in current thread
+    }
 };
 
 // error_callback_type example
 template<typename container_type>
 struct error_callback_t
 {
-	void operator()(const int thread_index, const size_t fullset_size, 
-		const container_type& cont, const std::string& error)
-	{
-		std::cerr << error << std::endl;
-	}
+    void operator()(const int thread_index, const size_t fullset_size, 
+        const container_type& cont, const std::string& error)
+    {
+        std::cerr << error << std::endl;
+    }
 };
 
 
@@ -179,10 +179,10 @@ struct error_callback_t
 template<typename T>
 struct predicate_t
 {
-	bool operator()(T a, T b)
-	{
-		return a == b;
-	}
+    bool operator()(T a, T b)
+    {
+        return a == b;
+    }
 };
 ```
 
@@ -200,10 +200,10 @@ void main()
     int64_t thread_cnt = 2;
     
     concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, 
-		[] (const int thread_index, uint32_t fullset, const std::vector<int>& cont) 
-			{ return true; } /* evaluation callback */,
-		[] (const int thread_index, uint32_t fullset, const std::vector<int>& cont, const std::string& error) 
-			{ std::cerr << error; } /* error callback */,
+        [] (const int thread_index, uint32_t fullset, const std::vector<int>& cont) 
+            { return true; } /* evaluation callback */,
+        [] (const int thread_index, uint32_t fullset, const std::vector<int>& cont, const std::string& error) 
+            { std::cerr << error; } /* error callback */,
         );
 }
 ```
@@ -222,13 +222,13 @@ void main()
     int64_t thread_cnt = 2;
     
     concurrent_comb::compute_all_comb(thread_cnt, subset, fullset_vec, 
-		[] (const int thread_index, uint32_t fullset, const std::vector<int>& cont) 
-			{ return true; } /* evaluation callback */,
-		[] (const int thread_index, uint32_t fullset, const std::vector<int>& cont, const std::string& error) 
-			{ std::cerr << error; } /* error callback */,
-		[] (int a, int b) 
-			{ return a == b; } /* predicate */
-		);
+        [] (const int thread_index, uint32_t fullset, const std::vector<int>& cont) 
+            { return true; } /* evaluation callback */,
+        [] (const int thread_index, uint32_t fullset, const std::vector<int>& cont, const std::string& error) 
+            { std::cerr << error; } /* error callback */,
+        [] (int a, int b) 
+            { return a == b; } /* predicate */
+        );
 }
 ```
 
@@ -249,22 +249,22 @@ void main()
     std::iota(results.begin(), results.end(), 'A');
     
     int64_t thread_cnt = 4;
-	int matched[4] = {0,0,0,0};
+    int matched[4] = {0,0,0,0};
 
     concurrent_perm::compute_all_perm(thread_cnt, results, 
-		[&matched](const int thread_index, const std::string& cont) /* evaluation callback */
-			{
-				if(...) 
-					++matched[thread_index];
-				return true;
-			},
-		[] (const int thread_index, const std::string& cont, const std::string& error) 
-			{ std::cerr << error; } /* error callback */, 
+        [&matched](const int thread_index, const std::string& cont) /* evaluation callback */
+            {
+                if(...) 
+                    ++matched[thread_index];
+                return true;
+            },
+        [] (const int thread_index, const std::string& cont, const std::string& error) 
+            { std::cerr << error; } /* error callback */, 
             
-		);
-			
-	int total_matched = matched[0] + matched[1] + matched[2] + matched[3];
-	// display total_matched
+        );
+            
+    int total_matched = matched[0] + matched[1] + matched[2] + matched[3];
+    // display total_matched
 }
 ```
 
@@ -291,20 +291,20 @@ void main()
     std::iota(results.begin(), results.end(), 'A');
     
     int64_t thread_cnt = 4;
-	
-	int_type cpu_cnt = 2;
-	int_type cpu_index = 0; /* 0 or 1 */
-	int cpu_index_n = static_cast<int>(cpu_index);
+    
+    int_type cpu_cnt = 2;
+    int_type cpu_index = 0; /* 0 or 1 */
+    int cpu_index_n = static_cast<int>(cpu_index);
 
     concurrent_perm::compute_all_perm_shard(cpu_index, cpu_cnt, thread_cnt, results, 
-		[](const int thread_index, const std::string& cont) /* evaluation callback */
-			{
-				return true;
-			},
-		[] (const int thread_index, const std::string& cont, const std::string& error) 
-			{ std::cerr << error; } /* error callback */, 
+        [](const int thread_index, const std::string& cont) /* evaluation callback */
+            {
+                return true;
+            },
+        [] (const int thread_index, const std::string& cont, const std::string& error) 
+            { std::cerr << error; } /* error callback */, 
             
-		);
+        );
 }
 ```
 
@@ -313,24 +313,24 @@ void main()
 
 void main()
 {
-	std::vector<uint32_t> fullset(fullset_size);
-	std::iota(fullset.begin(), fullset.end(), 0);
+    std::vector<uint32_t> fullset(fullset_size);
+    std::iota(fullset.begin(), fullset.end(), 0);
     
     int64_t thread_cnt = 4;
-	
-	int_type cpu_cnt = 2;
-	int_type cpu_index = 0; /* 0 or 1 */
-	int cpu_index_n = static_cast<int>(cpu_index);
+    
+    int_type cpu_cnt = 2;
+    int_type cpu_index = 0; /* 0 or 1 */
+    int cpu_index_n = static_cast<int>(cpu_index);
 
     concurrent_comb::compute_all_comb_shard(cpu_index, cpu_cnt, thread_cnt, subset_size, fullset, 
-		[](const int thread_index, const size_t fullset_cnt, const std::vector<uint32_t>& cont) 
-			{ /* evaluation callback */
-				return true;
-			},
-		[] (const int thread_index, const std::vector<uint32_t>& cont, const std::string& error) 
-			{ std::cerr << error; } /* error callback */, 
+        [](const int thread_index, const size_t fullset_cnt, const std::vector<uint32_t>& cont) 
+            { /* evaluation callback */
+                return true;
+            },
+        [] (const int thread_index, const std::vector<uint32_t>& cont, const std::string& error) 
+            { std::cerr << error; } /* error callback */, 
             
-		);
+        );
 }
 ```
 
