@@ -1,33 +1,52 @@
-## Boost Concurrent Permutations and Combinations on CPU
+# Boost Concurrent Permutations and Combinations on CPU
 
-### Primary motivation
+## Table of contents
+
+* Primary motivation
+* Requirement
+* Compiler tested
+* Build examples with GCC and Clang
+* No CMakeList?
+* Formulae to calculate total results returned
+* Limitation
+* Examples
+* Why not pass in begin and end iterators?
+* How to make use of thread_index parameter in callback?
+* Cancellation
+* How many threads are spawned?
+* How to split the work across physically separate processors?
+* Benchmark results
+* Diminishing returns on 4 threads
+* History
+
+## Primary motivation
 
 Upcoming C++17 Concurrent STL algorithms does not include parallel `next_permutation` and `next_combination`. `compute_all_perm` and `compute_all_comb` make use of `next_permutation` and `next_combination` underneath to find all the permutations and combinations. Many years ago, I had written parallel library which only deals with integer type but it exposes many internal workings. This one encapsulates the details and can permute/combine with any data types.
 
-**Note**: Function overload with predicate is available.
+__Note__: Function overload with predicate is available.
 
-**Note**: Work is still ongoing. Library is not yet submitted for Boost review and is not part of Boost Library.
+__Note__: Work is still ongoing. Library is not yet submitted for Boost review and is not part of Boost Library.
 
-### Requirement
+## Requirement
 
-**Required**: C++11
+__Required__: C++11<br />
+__Optional__: [Boost Multiprecision](http://www.boost.org/doc/libs/1_62_0/libs/multiprecision/doc/html/index.html)<br />
+__Note__: Library need Boost Multiprecision for factorial(n) where n > 20. You either use the arbitrary integer(most safe) or fixed width big integer to accommodate the largest factorial.
 
-**Optional**: [Boost Multiprecision](http://www.boost.org/doc/libs/1_62_0/libs/multiprecision/doc/html/index.html)
-**Note**: Library need Boost Multiprecision for factorial(n) where n > 20. You either use the arbitrary integer(most safe) or fixed width big integer to accommodate the largest factorial. 
-
-```cpp
+```Cpp
 // arbitrary integer
 boost::multiprecision::cpp_int;
 // 256 bit integer
 boost::multiprecision::int256_t;
 ```
 
-### Compiler tested
-- Visual C++ 2015
-- GCC 5.4 Ubuntu 16.04
-- Clang 3.8 Ubuntu 16.04
+## Compiler tested
 
-### Build examples with GCC and Clang
+* Visual C++ 2015
+* GCC 5.4 Ubuntu 16.04
+* Clang 3.8 Ubuntu 16.04
+
+## Build examples with GCC and Clang
 
 ```
 g++     CalcPerm.cpp -std=c++11 -lpthread -O2
@@ -37,32 +56,31 @@ clang++ CalcPerm.cpp -std=c++11 -lpthread -O2
 clang++ CalcComb.cpp -std=c++11 -lpthread -O2
 ```
 
-### No CMakeList?
+## No CMakeList?
 
 This is header-only library.
 
-### Formulae to calculate total results returned.
+## Formulae to calculate total results returned
 
 Calculate this in a calculator and use sum to determine the largest integer type to be used.
 
-```cpp
+```
 Total Permutation: n!
 Total Combination: n! / (r! (n - r)!)
 ```
 
-Use `compute_factorial`  to calculate total permutation count.
+* Use `compute_factorial` to calculate total permutation count.
+* Use `compute_total_comb` to calculate total combination count.
 
-Use `compute_total_comb` to calculate total combination count.
-
-### Limitation
+## Limitation
 
 `next_permutation` supports duplicate elements but `compute_all_perm` and `compute_all_comb` do not. Make sure every element is unique. Also make sure total results are greater than number of threads spawned.
 
-### Examples
+## Examples
 
 `compute_all_perm` function and callback signatures shown below. Callback should catch all exceptions and return false. If exception propagate outside callback, error_callback will be invoked and processing will be stopped prematurely for the thread.
 
-```cpp
+```Cpp
 // compute_all_perm function signature
 template<typename int_type, typename container_type, typename callback_type, 
     typename error_callback_type, typename predicate_type = no_predicate_type>
@@ -102,13 +120,13 @@ struct predicate_t
 
 Example on how to use `compute_all_perm`
 
-```cpp
+```Cpp
 #include "../permcomb/concurrent_perm.h"
 
 void main()
 {
-    std::string results(11, 'A');
-    std::iota(results.begin(), results.end(), 'A');
+    std::string results(11, &#39;A&#39;);
+    std::iota(results.begin(), results.end(), &#39;A&#39;);
     
     int64_t thread_cnt = 2;
 
@@ -123,13 +141,13 @@ void main()
 
 Example on how to use `compute_all_perm` with predicate
 
-```cpp
+```Cpp
 #include "../permcomb/concurrent_perm.h"
 
 void main()
 {
-    std::string results(11, 'A');
-    std::iota(results.begin(), results.end(), 'A');
+    std::string results(11, &#39;A&#39;);
+    std::iota(results.begin(), results.end(), &#39;A&#39;);
     
     int64_t thread_cnt = 2;
 
@@ -146,7 +164,7 @@ void main()
 
 `compute_all_comb` function and callback signatures shown below. Callback should catch all exceptions and return false. If exception propagate outside callback, error_callback will be invoked and processing will be stopped prematurely for the thread.
 
-```cpp
+```Cpp
 // compute_all_comb function signature
 template<typename int_type, typename container_type, typename callback_type, 
     typename error_callback_type, typename predicate_type = no_predicate_type>
@@ -174,7 +192,6 @@ struct error_callback_t
     }
 };
 
-
 // predicate_type example
 template<typename T>
 struct predicate_t
@@ -188,7 +205,7 @@ struct predicate_t
 
 Example on how to use `compute_all_comb`
 
-```cpp
+```Cpp
 #include "../permcomb/concurrent_comb.h"
 
 void main()
@@ -210,7 +227,7 @@ void main()
 
 Example on how to use `compute_all_comb` with predicate
 
-```cpp
+```Cpp
 #include "../permcomb/concurrent_comb.h"
 
 void main()
@@ -232,21 +249,21 @@ void main()
 }
 ```
 
-### Why not pass in begin and end iterators?
+## <a name="begin_end">Why not pass in begin and end iterators?</a>
 
 Library need to know the container type to instantiate a copy in the worker thread. From the iterator type, we have no way to know the container. Iterator type is not compatible: for example `string` and `vector` iterator are not interchangeable; It is not right that user pass `string` iterator but library pass `vector` iterator to callback.
 
-### How to make use of thread_index parameter in callback?
+## <a name="thread_index">How to make use of thread_index parameter in callback?</a>
 
 `thread_index` is a zero based and consecutive number. For example when `thread_cnt` is 4, then `thread_index` would be [0..3]. Data type of `thread_cnt` has to be a type large enough to hold the largest factorial required.
 
-```cpp
+```Cpp
 #include "../permcomb/concurrent_perm.h"
 
 void main()
 {
-    std::string results(11, 'A');
-    std::iota(results.begin(), results.end(), 'A');
+    std::string results(11, &#39;A&#39;);
+    std::iota(results.begin(), results.end(), &#39;A&#39;);
     
     int64_t thread_cnt = 4;
     int matched[4] = {0,0,0,0};
@@ -268,27 +285,28 @@ void main()
 }
 ```
 
-I'll leave to the reader to fix false-sharing in the above example.
+I&#39;ll leave to the reader to fix false-sharing in the above example.
 
-### Cancellation
+## Cancellation
 
 Cancellation is not directly supported but every callback can return `false` to cancel processing.
 
-### How many threads are spawned?
+## How many threads are spawned?
 
-**Answer**: `thread_cnt` - 1. For `thread_cnt` = 4, 3 threads will be spawned while main thread is used to compute the 4th batch. For `thread_cnt` = 1, no threads is spawned, all work is done in the main thread.
+__Answer__: `thread_cnt` - 1. For `thread_cnt` = 4, 3 threads will be spawned while main thread is used to compute the 4th batch. For `thread_cnt` = 1, no threads is spawned, all work is done in the main thread.
 
-### How to split the work across physically separate processors?
 
-Say you have more than 1 computer at home or can access cloud of computers, Work can be split using `compute_all_perm_shard`. In fact `compute_all_perm` calls `compute_all_perm_shard` to do the work as well. `compute_all_perm_shard` has 2 extra parameters which are `cpu_index` and `cpu_cnt`. Value of `cpu_index` can be [0..`cpu_cnt`).
+## How to split the work across physically separate processors?
 
-```cpp
+Say you have more than 1 computer at home or can access cloud of computers, Work can be split using `compute_all_perm_shard`. In fact `compute_all_perm` calls `compute_all_perm_shard` to do the work as well. `compute_all_perm_shard` has 2 extra parameters which are `cpu_index` and `cpu_cnt`. Value of `cpu_index` can be `[0..cpu_cnt)`.
+
+```Cpp
 #include "../permcomb/concurrent_perm.h"
 
 void main()
 {
-    std::string results(11, 'A');
-    std::iota(results.begin(), results.end(), 'A');
+    std::string results(11, &#39;A&#39;);
+    std::iota(results.begin(), results.end(), &#39;A&#39;);
     
     int64_t thread_cnt = 4;
     
@@ -308,7 +326,7 @@ void main()
 }
 ```
 
-```cpp
+```Cpp
 #include "../permcomb/concurrent_comb.h"
 
 void main()
@@ -334,7 +352,7 @@ void main()
 }
 ```
 
-### Benchmark results
+## Benchmark results
 
 Intel i7 6700 CPU with 16 GB RAM with Visual C++ on Windows 10
 
@@ -362,6 +380,14 @@ next_combination:  789ms
      4 thread(s):  242ms
 ```
 
-### Diminishing returns on 4 threads
+## Diminishing returns on 4 threads
 
 Main suspect is the Intel i7 6700 CPU is a 4 core processor where other applications are running. Need a multicore CPU with more than 4 cores to see whether diminishing perf gain issue persist!
+
+Code is hosted at [Github](https://github.com/shaovoon/concurrent_permcomb)
+
+## History
+
+* __28th Jan 2017:__ First Release
+* __5th Apr 2017:__ Added more error handling
+
